@@ -340,7 +340,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 .track-window {
   --shadow-room: 16px;
   width: calc(var(--window-w, 100%) + 2 * var(--shadow-room));
-  flex: 0 1 790px;          /* takes the height left under the header, up to 790px */
+  flex: 0 1 672px;          /* takes the height left under the header, up to 640px cards */
   min-height: 0;
   margin: 0 auto;
   padding: var(--shadow-room);
@@ -368,26 +368,71 @@ strong { color: var(--accent-2); font-weight: 600; }
 .projects.in .card:nth-child(3) { transition-delay: 0.16s; }
 .projects.in .card:nth-child(n + 4) { transition-delay: 0.24s; }
 
+/* project card: small image, title, brief, stack, highlights, view button */
 .thumb {
-  flex: 1;
-  min-height: 0;
+  flex: none;
+  height: clamp(72px, 16vh, 160px);   /* deliberately small */
   display: grid;
   place-items: center;
+  overflow: hidden;
   font-family: var(--pixel-font);
-  font-size: clamp(28px, 3vw, 44px);
+  font-size: clamp(20px, 2.2vw, 32px);
   color: var(--accent-2);
   background:
     repeating-linear-gradient(45deg, transparent 0 8px, rgba(139, 69, 230, 0.08) 8px 16px),
     #2c2c30;
 }
-.card-body { padding: 24px; display: flex; flex-direction: column; gap: 12px; }
-.card h3 { font-family: var(--pixel-font); font-size: clamp(12px, 1.1vw, 15px); }
-.card p { color: var(--muted); font-size: 15px; }
-.link {
+.thumb img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+.card-body {
+  flex: 1;
+  min-height: 0;
+  padding: clamp(16px, 1.6vw, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.card h3 { font-family: var(--pixel-font); font-size: clamp(12px, 1.1vw, 15px); line-height: 1.4; }
+.card .brief {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card h4 {
   font-family: var(--pixel-font);
-  font-size: 10px;
+  font-size: 9px;
   color: var(--accent-2);
-  text-decoration: none;
+  margin-bottom: 8px;
+}
+.card .tags { gap: 6px; }
+.card .tags li { font-size: 12px; }
+.features { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; line-height: 1.5; }
+.features li { display: flex; gap: 10px; }
+.features li::before {          /* pixel-square bullet */
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-top: 0.6em;
+  background: var(--accent);
+}
+.card .view {
+  margin-top: auto;               /* button sits at the bottom of the card */
+  align-self: flex-start;
+  font-size: 10px;
+  padding: 10px 14px;
+}
+
+/* short laptop screens: tighter card so everything still fits */
+@media (min-width: 761px) and (max-height: 650px) {
+  .thumb { height: 56px; }
+  .card-body { gap: 9px; }
+  .card .brief { -webkit-line-clamp: 2; font-size: 13px; }
+  .card h4 { display: none; }
+  .features { gap: 3px; font-size: 12.5px; }
 }
 
 .contact-card {
@@ -488,7 +533,7 @@ strong { color: var(--accent-2); font-weight: 600; }
   .track-window { width: auto; height: auto; padding: 0; overflow: visible; }
   .track { flex-direction: column; height: auto; gap: 24px; transform: none; }
   .card { flex: none; }
-  .thumb { flex: none; aspect-ratio: 16 / 10; }
+  .thumb { height: 140px; }
   /* the last card fills the screen below the nav, like it fills the track on desktop */
   /* extra space above it (112px in all with the gap) keeps the previous card,
      including its pixel border and shadow, off screen once it lands below the nav */
