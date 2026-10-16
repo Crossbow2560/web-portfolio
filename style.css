@@ -383,7 +383,9 @@ strong { color: var(--accent-2); font-weight: 600; }
   .hint { margin-top: 12px; }
 
   .stage.is-about::before { left: 50%; }
-  .stage.is-about .avatar { left: 50%; transform: translateX(-50%) scale(0.55); }
+  /* portrait stays at the bottom, scaled to the space left under each panel
+     (--av-scale-* are measured in script.js) */
+  .stage.is-about .avatar { left: 50%; transform: translateX(-50%) scale(var(--av-scale-about, 0.55)); }
   .stage.is-about .hero-left { transform: translateX(calc(-100% - 40px)); }
   .stage.is-about .hero-right { transform: translateY(60vh); }
 
@@ -399,7 +401,7 @@ strong { color: var(--accent-2); font-weight: 600; }
   .stage.is-about .about { transform: none; }
   .skills { transform: translateX(calc(-100% - 50vw)); }
   .stage.is-skills::before { left: 68%; }
-  .stage.is-skills .avatar { left: 68%; }
+  .stage.is-skills .avatar { left: 68%; transform: translateX(-50%) scale(var(--av-scale-skills, 0.55)); }
   .stage.is-skills .about { transform: translateX(calc(100% + 50vw)); }
   .stage.is-skills .skills { transform: none; }
   .panel h2 { font-size: 18px; }
@@ -429,9 +431,6 @@ strong { color: var(--accent-2); font-weight: 600; }
   .panel h2 { font-size: 15px; }
 }
 
-/* short phones: no room for portrait + about panel, so the portrait drops away */
-@media (max-width: 760px) and (max-height: 760px) {
-  .stage.is-about .avatar { transform: translate(-50%, 100%); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

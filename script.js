@@ -16,6 +16,8 @@ function layout() {
   const bp = window.innerWidth;        // matches CSS media queries
   const vh = window.innerHeight;
 
+  fitPhoneAvatar(bp <= 760, vh);
+
   vertical = bp <= 760;  // matches the phone media query in style.css
   projects.classList.toggle("is-vertical", vertical);
   if (vertical) {
@@ -42,6 +44,18 @@ function layout() {
   holdStart = vh * 0.15;
   const holdEnd = vh * 0.25;
   projects.style.height = `${vh + holdStart + travel + holdEnd}px`;
+}
+
+// Phones: in the about and skills states the portrait stays at the bottom, scaled
+// to fit the space left under that panel.
+function fitPhoneAvatar(phone, vh) {
+  for (const name of ["about", "skills"]) {
+    if (!phone) { stage.style.removeProperty(`--av-scale-${name}`); continue; }
+    const panel = stage.querySelector(`.${name}`);
+    const imgH = stage.querySelector(".avatar img").offsetHeight;
+    const free = vh - (panel.offsetTop + panel.offsetHeight) - 16;
+    stage.style.setProperty(`--av-scale-${name}`, clamp(free / imgH, 0.25, 1).toFixed(3));
+  }
 }
 
 function onScroll() {
@@ -90,5 +104,6 @@ window.addEventListener("scroll", onScroll, { passive: true });
 window.addEventListener("resize", () => { layout(); onScroll(); });
 layout();
 onScroll();
+document.fonts.ready.then(layout);  // panel heights change once the web fonts load
 
 document.getElementById("year").textContent = new Date().getFullYear();
