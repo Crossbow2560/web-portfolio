@@ -4,6 +4,7 @@ const projects = document.getElementById("projects");
 const pin = projects.querySelector(".projects-pin");
 const track = document.getElementById("track");
 const head = projects.querySelector(".projects-head");
+const contact = document.getElementById("contact");
 
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
@@ -92,6 +93,9 @@ function onScroll() {
   if (vertical) {
     for (const el of [head, ...track.children])
       el.classList.toggle("in", shrink >= 0.5 && el.getBoundingClientRect().top < vh * 0.92);
+    // dead end: the contact card is fully on screen
+    const c = contact.getBoundingClientRect();
+    pin.classList.toggle("contact-done", c.top >= 0 && c.bottom <= vh + 1);
     return;
   }
 
@@ -103,6 +107,8 @@ function onScroll() {
   track.style.setProperty("--track-x", x.toFixed(1));
   // the header fades out during the last slide, as the contact card comes in
   pin.style.setProperty("--contact-in", clamp((x - (travel - lastStep)) / lastStep, 0, 1).toFixed(3));
+  // dead end: the contact card has fully slid in
+  pin.classList.toggle("contact-done", travel > 0 && x >= travel - 1);
 }
 
 // Contact lives at the end of the horizontal track, so jump to the end of the section.
@@ -110,7 +116,7 @@ document.querySelectorAll('a[href="#contact"]').forEach((a) =>
   a.addEventListener("click", (e) => {
     e.preventDefault();
     const top = vertical
-      ? document.getElementById("contact").getBoundingClientRect().top + window.scrollY - 96
+      ? document.getElementById("contact").getBoundingClientRect().top + window.scrollY - 140
       : projects.offsetTop + projects.offsetHeight - window.innerHeight;
     window.scrollTo({ top });
   })

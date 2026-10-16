@@ -345,6 +345,9 @@ strong { color: var(--accent-2); font-weight: 600; }
   margin: 0 auto;
   padding: var(--shadow-room);
   overflow: hidden;
+  /* clip only sideways, so the "Contact Me" heading can sit above the contact card */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 .track {
   display: flex;
@@ -435,7 +438,30 @@ strong { color: var(--accent-2); font-weight: 600; }
   .features { gap: 3px; font-size: 12.5px; }
 }
 
+/* "Contact Me" pops up from behind the contact card's top-left edge once the card
+   has fully arrived (.contact-done, set in script.js): the wrapper clips at the
+   card's top border and the heading slides straight up out of it.
+   On laptops it lands where the Projects heading was. */
+.contact-head {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 4px);                 /* just above the pixel top border */
+  padding-bottom: var(--contact-head-gap, calc(12px + clamp(4px, 1.2vh, 12px)));
+  overflow: hidden;
+  pointer-events: none;
+}
+.contact-card .contact-head h2 {    /* beats the contact card's own h2 style */
+  font-family: var(--pixel-font);
+  font-size: clamp(18px, 2.2vw, 30px);
+  line-height: 1.4;
+  white-space: nowrap;
+  transform: translateY(calc(100% + 40px));
+  transition: transform 0.6s var(--ease);   /* plain slide, no overshoot */
+}
+.contact-done .contact-card .contact-head h2 { transform: none; }
+
 .contact-card {
+  position: relative;
   flex-basis: var(--contact-w, 100%);
   align-items: center;
   justify-content: center;
@@ -534,15 +560,19 @@ strong { color: var(--accent-2); font-weight: 600; }
   .track { flex-direction: column; height: auto; gap: 24px; transform: none; }
   .card { flex: none; }
   .thumb { height: 140px; }
-  /* the last card fills the screen below the nav, like it fills the track on desktop */
-  /* extra space above it (112px in all with the gap) keeps the previous card,
-     including its pixel border and shadow, off screen once it lands below the nav */
-  .contact-card { flex-basis: auto; min-height: calc(100vh - 96px - 48px); margin-top: 88px; }
+  /* the last card fills the screen below the nav and its "Contact Me" heading, like it
+     fills the track on desktop. Extra space above it (156px in all with the gap)
+     keeps the previous card, including its pixel border and shadow, off screen
+     once it lands 140px down. */
+  .contact-card { flex-basis: auto; min-height: calc(100vh - 140px - 48px); margin-top: 132px; }
+  .contact-head { --contact-head-gap: 14px; }
+  .contact-card .contact-head h2 { font-size: 18px; }
   .card.in { opacity: 1; transform: none; }
 }
 
-/* very short phones: tighten the about panel so it fits */
+/* very short phones: tighten the about panel and contact card so they fit */
 @media (max-width: 760px) and (max-height: 600px) {
+  .contact-card { gap: 16px; padding: 20px; }
   .panel { top: 76px; padding: 16px; font-size: 14px; line-height: 1.55; }
   .panel h2 { font-size: 15px; }
 }
