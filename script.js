@@ -72,28 +72,28 @@ function onScroll() {
   const vh = window.innerHeight;
 
   // Frames 1 → 2 → 3: hero, about, skills, then fade the stage out completely.
-  // The fade ends at the same distance from the intro's end as before, so the
-  // projects crossfade timing is unchanged.
-  const scrollable = intro.offsetHeight - vh;
-  const p = clamp(-intro.getBoundingClientRect().top / scrollable, 0, 1);
-  stage.classList.toggle("is-about", p > 0.18);
-  stage.classList.toggle("is-skills", p > 0.5);
-  const shrink = clamp((p - 0.832) / 0.12, 0, 1);
+  // Timeline in vh scrolled through the intro (380vh tall, 280vh scrollable):
+  //   0–36 hero · 36–140 about · 140–246.4 skills · 246.4–270.4 fade · 270.4–280 tail
+  // The fade ends 9.6vh before the intro does, which the projects crossfade relies on.
+  const sv = (-intro.getBoundingClientRect().top / vh) * 100;
+  stage.classList.toggle("is-about", sv > 36);
+  stage.classList.toggle("is-skills", sv > 140);
+  const shrink = clamp((sv - 246.4) / 24, 0, 1);
   stage.style.setProperty("--shrink", shrink.toFixed(3));
   stage.style.visibility = shrink >= 1 ? "hidden" : "";
 
   // Phones: each card rises in as it scrolls into view (not before the skills
-  // panel is halfway faded, so cards never sit on top of it).
+  // panel is halfway faded, so cards never sit on top of it) and drops back out
+  // when scrolled away above that point.
   if (vertical) {
-    if (shrink < 0.5) return;
     for (const card of track.children)
-      if (card.getBoundingClientRect().top < vh * 0.92) card.classList.add("in");
+      card.classList.toggle("in", shrink >= 0.5 && card.getBoundingClientRect().top < vh * 0.92);
     return;
   }
 
   // Frame 3: cards rise in, then vertical scroll drives them sideways.
   const top = projects.getBoundingClientRect().top;
-  if (top < vh * 0.6) projects.classList.add("in");
+  projects.classList.toggle("in", top < vh * 0.6);  // undone when scrolling back up
   let x = clamp(-top - holdStart, 0, travel);
   if (travel - x < 1) x = travel;  // fractional scroll positions can stop a hair short
   track.style.setProperty("--track-x", x.toFixed(1));

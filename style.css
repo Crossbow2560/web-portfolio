@@ -126,9 +126,10 @@ strong { color: var(--accent-2); font-weight: 600; }
 .topbar nav a:hover { color: var(--text); }
 
 /* ---------- frames 1 & 2: intro ---------- */
-.intro { position: relative; height: 300vh; }
-.anchor { position: absolute; top: 60vh; }
-.anchor-skills { top: 130vh; }
+.intro { position: relative; height: 380vh; }
+/* nav targets, inside the about and skills stretches (timeline in script.js) */
+.anchor { position: absolute; top: 70vh; }
+.anchor-skills { top: 180vh; }
 
 .stage {
   position: sticky;
