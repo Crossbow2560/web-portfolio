@@ -152,7 +152,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 
 .stage > * {
   position: absolute;
-  transition: transform 0.9s var(--ease), opacity 0.9s var(--ease), left 0.9s var(--ease), top 0.9s var(--ease);
+  transition: transform 0.9s var(--ease), opacity 0.9s var(--ease), left 0.9s var(--ease);
 }
 
 .avatar {
@@ -383,7 +383,7 @@ strong { color: var(--accent-2); font-weight: 600; }
   .hint { margin-top: 12px; }
 
   .stage.is-about::before { left: 50%; }
-  /* portrait stays at the bottom, scaled to the space left under each panel
+  /* portrait stays at the bottom, scaled to fill the space left under each panel
      (--av-scale-* are measured in script.js) */
   .stage.is-about .avatar { left: 50%; transform: translateX(-50%) scale(var(--av-scale-about, 0.55)); }
   .stage.is-about .hero-left { transform: translateX(calc(-100% - 40px)); }

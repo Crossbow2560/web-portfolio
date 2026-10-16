@@ -16,7 +16,7 @@ function layout() {
   const bp = window.innerWidth;        // matches CSS media queries
   const vh = window.innerHeight;
 
-  fitPhoneAvatar(bp <= 760, vh);
+  fitPhoneAvatar();
 
   vertical = bp <= 760;  // matches the phone media query in style.css
   projects.classList.toggle("is-vertical", vertical);
@@ -47,16 +47,28 @@ function layout() {
 }
 
 // Phones: in the about and skills states the portrait stays at the bottom, scaled
-// to fit the space left under that panel.
-function fitPhoneAvatar(phone, vh) {
+// to fill the space left under that panel (it may grow past its hero size, but
+// never wider than 70% of the screen).
+function fitPhoneAvatar() {
+  const phone = window.innerWidth <= 760;
+  const img = stage.querySelector(".avatar img");
   for (const name of ["about", "skills"]) {
     if (!phone) { stage.style.removeProperty(`--av-scale-${name}`); continue; }
     const panel = stage.querySelector(`.${name}`);
-    const imgH = stage.querySelector(".avatar img").offsetHeight;
-    const free = vh - (panel.offsetTop + panel.offsetHeight) - 16;
-    stage.style.setProperty(`--av-scale-${name}`, clamp(free / imgH, 0.25, 1).toFixed(3));
+    const free = window.innerHeight - (panel.offsetTop + panel.offsetHeight) - 16;
+    // about: centred, up to 70% of the width. skills: centred at 68% (style.css),
+    // so its right half may only use the remaining 32%, minus an 8px margin.
+    const w = window.innerWidth;
+    const maxWidth = name === "about" ? w * 0.7 : 2 * (w * 0.32 - 8);
+    const maxScale = Math.min(2, maxWidth / img.offsetWidth);
+    stage.style.setProperty(`--av-scale-${name}`, clamp(free / img.offsetHeight, 0.25, maxScale).toFixed(3));
   }
 }
+// Re-fit whenever anything that affects it changes size: the viewport (rotation,
+// browser bars, device previews), the panels (web fonts loading) or the image.
+new ResizeObserver(fitPhoneAvatar).observe(document.documentElement);
+for (const el of stage.querySelectorAll(".about, .skills, .avatar img"))
+  new ResizeObserver(fitPhoneAvatar).observe(el);
 
 function onScroll() {
   const vh = window.innerHeight;
