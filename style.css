@@ -34,11 +34,17 @@ body {
   overflow-x: clip;
 }
 
-/* tarmac: dark grit + a few light aggregate flecks, pinned to the screen so it never scrolls */
+/* tarmac: dark grit + a few light aggregate flecks, pinned to the screen so it never scrolls.
+   Sized to the *large* viewport (address bar hidden) rather than inset: 0, so when a phone's
+   address bar slides away the newly exposed strip at the bottom is already covered. */
 body::before {
   content: "";
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;    /* fallback: on mobile Chrome/Safari vh is already the large viewport */
+  height: 100lvh;
   z-index: -1;
   pointer-events: none;
   background-image:
