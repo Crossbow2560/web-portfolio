@@ -15,9 +15,9 @@
   --pad: clamp(16px, 4vw, 48px);
   --W: calc(min(100vw, 1600px) - 2 * var(--pad));
   --hero-text: clamp(15px, calc(var(--W) * 0.0165), 21px);
-  /* portrait height; never wider than the middle 34% of W (image ratio is 52:88) */
-  --av-h: min(calc(100vh - 110px), calc(var(--W) * 0.34 * 88 / 52));
-  --av-half: calc(var(--av-h) * 26 / 88);
+  /* portrait height; never wider than the middle 34% of W (image ratio is 52:90) */
+  --av-h: min(calc(100vh - 110px), calc(var(--W) * 0.34 * 90 / 52));
+  --av-half: calc(var(--av-h) * 26 / 90);
   --hero-gap: clamp(24px, 2.4vw, 40px);  /* text ↔ portrait */
 }
 
