@@ -400,8 +400,8 @@ strong { color: var(--accent-2); font-weight: 600; }
   }
   .stage.is-about .about { transform: none; }
   .skills { transform: translateX(calc(-100% - 50vw)); }
-  .stage.is-skills::before { left: 68%; }
-  .stage.is-skills .avatar { left: 68%; transform: translateX(-50%) scale(var(--av-scale-skills, 0.55)); }
+  .stage.is-skills::before { left: 50%; }
+  .stage.is-skills .avatar { left: 50%; transform: translateX(-50%) scale(var(--av-scale-skills, 0.55)); }
   .stage.is-skills .about { transform: translateX(calc(100% + 50vw)); }
   .stage.is-skills .skills { transform: none; }
   .panel h2 { font-size: 18px; }

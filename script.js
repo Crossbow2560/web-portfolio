@@ -56,11 +56,8 @@ function fitPhoneAvatar() {
     if (!phone) { stage.style.removeProperty(`--av-scale-${name}`); continue; }
     const panel = stage.querySelector(`.${name}`);
     const free = window.innerHeight - (panel.offsetTop + panel.offsetHeight) - 16;
-    // about: centred, up to 70% of the width. skills: centred at 68% (style.css),
-    // so its right half may only use the remaining 32%, minus an 8px margin.
-    const w = window.innerWidth;
-    const maxWidth = name === "about" ? w * 0.7 : 2 * (w * 0.32 - 8);
-    const maxScale = Math.min(2, maxWidth / img.offsetWidth);
+    // centred in both states, up to 70% of the screen width
+    const maxScale = Math.min(2, (window.innerWidth * 0.7) / img.offsetWidth);
     stage.style.setProperty(`--av-scale-${name}`, clamp(free / img.offsetHeight, 0.25, maxScale).toFixed(3));
   }
 }
