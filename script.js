@@ -55,7 +55,8 @@ function fitPhoneAvatar() {
   for (const name of ["about", "skills"]) {
     if (!phone) { stage.style.removeProperty(`--av-scale-${name}`); continue; }
     const panel = stage.querySelector(`.${name}`);
-    const free = window.innerHeight - (panel.offsetTop + panel.offsetHeight) - 16;
+    const tail = name === "about" ? 24 : 0;  // the about panel's speech-bubble tail
+    const free = window.innerHeight - (panel.offsetTop + panel.offsetHeight) - tail - 16;
     // centred in both states, up to 70% of the screen width
     const maxScale = Math.min(2, (window.innerWidth * 0.7) / img.offsetWidth);
     stage.style.setProperty(`--av-scale-${name}`, clamp(free / img.offsetHeight, 0.25, maxScale).toFixed(3));

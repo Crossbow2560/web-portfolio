@@ -148,7 +148,7 @@ strong { color: var(--accent-2); font-weight: 600; }
   transition: left 0.9s var(--ease);
   pointer-events: none;
 }
-.stage.is-about::before { left: 24%; }
+.stage.is-about::before { left: 21%; }
 
 .stage > * {
   position: absolute;
@@ -222,6 +222,34 @@ strong { color: var(--accent-2); font-weight: 600; }
 .panel p { margin-bottom: 0.8em; color: var(--muted); }
 .panel p:first-of-type { color: var(--text); }
 
+/* speech-bubble tail on the about panel, drawn as a stepped pixel triangle (4px
+   steps) filled like the panel and outlined by the drop-shadows.
+   Laptop: a right-angle triangle off the top-left corner — its top edge continues
+   the panel's top border, the slope steps back down to the left edge.
+   Phone: an isosceles tail at the bottom centre, pointing down (see media query). */
+.bubble-tail {
+  position: absolute;
+  left: -24px;              /* the 4px base column covers the panel's left border */
+  top: 0;
+  width: 24px;
+  height: 24px;
+  filter:
+    drop-shadow(-4px 0 0 var(--line))
+    drop-shadow(0 4px 0 var(--line))
+    drop-shadow(0 -4px 0 var(--line));
+  pointer-events: none;
+}
+.bubble-tail::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--surface);
+  clip-path: polygon(
+    0 0, 24px 0, 24px 24px, 20px 24px, 20px 20px, 16px 20px, 16px 16px,
+    12px 16px, 12px 12px, 8px 12px, 8px 8px, 4px 8px, 4px 4px, 0 4px
+  );
+}
+
 .skills dt {
   font-family: var(--pixel-font);
   font-size: 0.55em;
@@ -232,7 +260,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 .skills dd { margin-top: 0.35em; color: var(--muted); }
 
 /* frame 2 state: photo shifts left, text moves down, detail slides in from right */
-.stage.is-about .avatar { left: 24%; transform: translateX(-50%) scale(0.88); }
+.stage.is-about .avatar { left: 21%; transform: translateX(-50%) scale(0.88); }  /* room for the bubble tail */
 .stage.is-about .hero-left {
   transform: translate(calc(-50vw - 100%), -50%);
   opacity: 0;
@@ -405,6 +433,20 @@ strong { color: var(--accent-2); font-weight: 600; }
   .stage.is-skills .about { transform: translateX(calc(100% + 50vw)); }
   .stage.is-skills .skills { transform: none; }
   .panel h2 { font-size: 18px; }
+  /* tail turns to point down at the portrait (rotation keeps the outline right) */
+  .bubble-tail {
+    left: calc(50% - 12px);
+    top: calc(100% - 8px);
+    height: 40px;
+    transform: rotate(-90deg);
+  }
+  .bubble-tail::before {
+    clip-path: polygon(
+      24px 0, 24px 40px, 16px 40px, 16px 36px, 12px 36px, 12px 32px, 8px 32px,
+      8px 28px, 4px 28px, 4px 24px, 0 24px, 0 16px, 4px 16px, 4px 12px, 8px 12px,
+      8px 8px, 12px 8px, 12px 4px, 16px 4px, 16px 0
+    );
+  }
 
   /* projects: a plain vertical list on phones (no pinning, no sideways track) */
   .projects-pin {
