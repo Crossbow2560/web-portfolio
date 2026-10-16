@@ -120,8 +120,9 @@ strong { color: var(--accent-2); font-weight: 600; }
 .topbar nav a:hover { color: var(--text); }
 
 /* ---------- frames 1 & 2: intro ---------- */
-.intro { position: relative; height: 220vh; }
+.intro { position: relative; height: 300vh; }
 .anchor { position: absolute; top: 60vh; }
+.anchor-skills { top: 130vh; }
 
 .stage {
   position: sticky;
@@ -202,7 +203,8 @@ strong { color: var(--accent-2); font-weight: 600; }
 }
 @keyframes bob { 50% { transform: translateY(6px); } }
 
-.about {
+/* side panels (about, skills) share one style */
+.panel {
   right: clamp(16px, 4vw, 48px);
   top: 52%;
   width: min(56%, 760px);
@@ -212,14 +214,22 @@ strong { color: var(--accent-2); font-weight: 600; }
   opacity: 0;
   pointer-events: none;
 }
-.about h2 {
+.panel h2 {
   font-family: var(--pixel-font);
   font-size: min(30px, calc(var(--W) * 0.29 / 14));  /* ~2/3 of the hero name */
   margin-bottom: 0.8em;
 }
-.about .tags li { font-size: 0.75em; }
-.about p { margin-bottom: 0.8em; color: var(--muted); }
-.about p:first-of-type { color: var(--text); }
+.panel p { margin-bottom: 0.8em; color: var(--muted); }
+.panel p:first-of-type { color: var(--text); }
+
+.skills dt {
+  font-family: var(--pixel-font);
+  font-size: 0.55em;
+  color: var(--accent-2);
+  margin-top: 1.1em;
+}
+.skills dt:first-child { margin-top: 0; }
+.skills dd { margin-top: 0.35em; color: var(--muted); }
 
 /* frame 2 state: photo shifts left, text moves down, detail slides in from right */
 .stage.is-about .avatar { left: 24%; transform: translateX(-50%) scale(0.88); }
@@ -234,6 +244,24 @@ strong { color: var(--accent-2); font-weight: 600; }
   pointer-events: none;
 }
 .stage.is-about .about {
+  transform: translate(0, -50%);
+  opacity: 1;
+  pointer-events: auto;
+}
+/* frame 3 state: about scrolls right off screen, the portrait moves to the right
+   side (staying on screen), and skills slides in from the left */
+.skills {
+  left: var(--pad);
+  right: auto;
+  transform: translate(calc(-100% - 50vw), -50%);
+}
+.stage.is-skills::before { left: 78%; }
+.stage.is-skills .avatar { left: 78%; }
+.stage.is-skills .about {
+  transform: translate(calc(100% + 50vw), -50%);
+  pointer-events: none;
+}
+.stage.is-skills .skills {
   transform: translate(0, -50%);
   opacity: 1;
   pointer-events: auto;
@@ -328,6 +356,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {
+  .topbar nav { gap: clamp(12px, 4vw, 20px); padding: 14px 16px; }
   .topbar nav a { font-size: 8px; }
 
   /* portrait fills whatever height is left under the hero text */
@@ -358,7 +387,7 @@ strong { color: var(--accent-2); font-weight: 600; }
   .stage.is-about .hero-left { transform: translateX(calc(-100% - 40px)); }
   .stage.is-about .hero-right { transform: translateY(60vh); }
 
-  .about {
+  .panel {
     top: 88px;
     left: 16px;
     right: 16px;
@@ -368,13 +397,18 @@ strong { color: var(--accent-2); font-weight: 600; }
     transform: translateX(calc(100% + 40px));
   }
   .stage.is-about .about { transform: none; }
-  .about h2 { font-size: 18px; }
+  .skills { transform: translateX(calc(-100% - 50vw)); }
+  .stage.is-skills::before { left: 68%; }
+  .stage.is-skills .avatar { left: 68%; }
+  .stage.is-skills .about { transform: translateX(calc(100% + 50vw)); }
+  .stage.is-skills .skills { transform: none; }
+  .panel h2 { font-size: 18px; }
 }
 
 /* very short phones: tighten the about panel so it fits */
 @media (max-width: 760px) and (max-height: 600px) {
-  .about { top: 76px; padding: 16px; font-size: 14px; line-height: 1.55; }
-  .about h2 { font-size: 15px; }
+  .panel { top: 76px; padding: 16px; font-size: 14px; line-height: 1.55; }
+  .panel h2 { font-size: 15px; }
 }
 
 /* short phones: no room for portrait + about panel, so the portrait drops away */

@@ -36,18 +36,22 @@ function layout() {
 function onScroll() {
   const vh = window.innerHeight;
 
-  // Frames 1 → 2: toggle the about state, then fade the stage out completely.
+  // Frames 1 → 2 → 3: hero, about, skills, then fade the stage out completely.
+  // The fade ends at the same distance from the intro's end as before, so the
+  // projects crossfade timing is unchanged.
   const scrollable = intro.offsetHeight - vh;
   const p = clamp(-intro.getBoundingClientRect().top / scrollable, 0, 1);
-  stage.classList.toggle("is-about", p > 0.3);
-  const shrink = clamp((p - 0.72) / 0.2, 0, 1);
+  stage.classList.toggle("is-about", p > 0.18);
+  stage.classList.toggle("is-skills", p > 0.5);
+  const shrink = clamp((p - 0.832) / 0.12, 0, 1);
   stage.style.setProperty("--shrink", shrink.toFixed(3));
   stage.style.visibility = shrink >= 1 ? "hidden" : "";
 
   // Frame 3: cards rise in, then vertical scroll drives them sideways.
   const top = projects.getBoundingClientRect().top;
   if (top < vh * 0.6) projects.classList.add("in");
-  const x = clamp(-top - holdStart, 0, travel);
+  let x = clamp(-top - holdStart, 0, travel);
+  if (travel - x < 1) x = travel;  // fractional scroll positions can stop a hair short
   track.style.setProperty("--track-x", x.toFixed(1));
 }
 

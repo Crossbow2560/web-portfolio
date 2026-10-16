@@ -15,13 +15,15 @@
     <nav class="px-box">
       <a href="#projects">Projects</a>
       <a href="#about">About</a>
+      <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
 
-  <!-- Frames 1 & 2: hero → about (sticky, scroll-driven) -->
+  <!-- Frames 1–3: hero → about → skills (sticky, scroll-driven) -->
   <section class="intro" id="top">
     <span id="about" class="anchor"></span>
+    <span id="skills" class="anchor anchor-skills"></span>
     <div class="stage" id="stage">
       <div class="hero-left">
         <p class="kicker">Hi, I'm</p>
@@ -38,7 +40,7 @@
         <p class="hint">↓ scroll</p>
       </div>
 
-      <div class="about px-box">
+      <div class="panel about px-box">
         <h2>About</h2>
         <p>
           I'm an engineer who enjoys taking an idea from a sketch on graph paper
@@ -50,9 +52,20 @@
           Right now I'm focused on &lt;your current focus&gt;. Outside of work I
           &lt;hobbies&gt;.
         </p>
-        <ul class="tags">
-          <li>Python</li><li>C / C++</li><li>TypeScript</li><li>Linux</li><li>CAD</li>
-        </ul>
+      </div>
+
+      <div class="panel skills px-box">
+        <h2>Skills</h2>
+        <dl>
+          <dt>Languages</dt>
+          <dd>Python, C, C++, <strong>TypeScript</strong></dd>
+          <dt>Hardware</dt>
+          <dd><strong>STM32</strong>, ESP32, KiCad, soldering</dd>
+          <dt>Tools</dt>
+          <dd>Linux, Git, Docker, <strong>ROS</strong></dd>
+          <dt>CAD / Fab</dt>
+          <dd>Fusion 360, 3D printing</dd>
+        </dl>
       </div>
       </div>
     </div>
