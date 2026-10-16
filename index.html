@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nishit Bilimagga — Engineering Portfolio</title>
+  <meta name="description" content="Engineering portfolio of Nishit Bilimagga." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <nav class="px-box">
+      <a href="#projects">Projects</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <!-- Frames 1 & 2: hero → about (sticky, scroll-driven) -->
+  <section class="intro" id="top">
+    <span id="about" class="anchor"></span>
+    <div class="stage" id="stage">
+      <div class="hero-left">
+        <p class="kicker">Hi, I'm</p>
+        <h1>Nishit DB</h1>
+        <p class="tagline">Engineer · Builder · Tinkerer</p>
+      </div>
+
+      <figure class="avatar">
+        <img src="assets/avatar-torso.png" alt="Pixel-art portrait of Nishit" width="52" height="88" />
+      </figure>
+
+      <div class="hero-right">
+        <p>I build things that sit between hardware and software, and I like making them simple.</p>
+        <p class="hint">↓ scroll</p>
+      </div>
+
+      <div class="about px-box">
+        <h2>About</h2>
+        <p>
+          I'm an engineer who enjoys taking an idea from a sketch on graph paper
+          to something that actually runs. Most of my work is in
+          <strong>embedded systems</strong>, <strong>web</strong>, and
+          <strong>tooling</strong> that makes other engineers faster.
+        </p>
+        <p>
+          Right now I'm focused on &lt;your current focus&gt;. Outside of work I
+          &lt;hobbies&gt;.
+        </p>
+        <ul class="tags">
+          <li>Python</li><li>C / C++</li><li>TypeScript</li><li>Linux</li><li>CAD</li>
+        </ul>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 3: projects rise from the bottom, then slide sideways on vertical scroll.
+       The last card is the contact card and spans three card widths. -->
+  <section class="projects" id="projects" aria-label="Projects">
+    <div class="projects-pin">
+      <div class="track-window">
+      <div class="track" id="track">
+        <article class="card px-box">
+          <div class="thumb">01</div>
+          <div class="card-body">
+            <h3>Project One</h3>
+            <p>One-line pitch: what it is and the problem it solves.</p>
+            <ul class="tags"><li>Python</li><li>ROS</li></ul>
+            <a href="#" class="link">View →</a>
+          </div>
+        </article>
+        <article class="card px-box">
+          <div class="thumb">02</div>
+          <div class="card-body">
+            <h3>Project Two</h3>
+            <p>One-line pitch: what it is and the problem it solves.</p>
+            <ul class="tags"><li>C</li><li>STM32</li></ul>
+            <a href="#" class="link">View →</a>
+          </div>
+        </article>
+        <article class="card px-box">
+          <div class="thumb">03</div>
+          <div class="card-body">
+            <h3>Project Three</h3>
+            <p>One-line pitch: what it is and the problem it solves.</p>
+            <ul class="tags"><li>TypeScript</li><li>WebGL</li></ul>
+            <a href="#" class="link">View →</a>
+          </div>
+        </article>
+        <article class="card px-box">
+          <div class="thumb">04</div>
+          <div class="card-body">
+            <h3>Project Four</h3>
+            <p>One-line pitch: what it is and the problem it solves.</p>
+            <ul class="tags"><li>Fusion 360</li><li>3D print</li></ul>
+            <a href="#" class="link">View →</a>
+          </div>
+        </article>
+        <article class="card contact-card px-box" id="contact">
+          <h2>Let's build something.</h2>
+          <p>Want to work together, or just say hi?</p>
+          <a class="px-btn big" href="mailto:nishit.bilimagga@gmail.com">nishit.bilimagga@gmail.com</a>
+          <ul class="socials">
+            <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="https://linkedin.com/" target="_blank" rel="noopener">LinkedIn</a></li>
+            <li><a href="assets/resume.pdf">Résumé</a></li>
+          </ul>
+          <footer>© <span id="year"></span> Nishit DB</footer>
+        </article>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

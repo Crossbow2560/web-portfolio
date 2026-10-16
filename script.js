@@ -1,0 +1,67 @@
+const intro = document.querySelector(".intro");
+const stage = document.getElementById("stage");
+const projects = document.getElementById("projects");
+const pin = projects.querySelector(".projects-pin");
+const track = document.getElementById("track");
+
+const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+
+// Horizontal-scroll geometry, recomputed on resize.
+let travel = 0;     // px the track moves sideways
+let holdStart = 0;  // px of vertical scroll before the track starts moving
+
+function layout() {
+  const vw = pin.clientWidth;          // excludes the scrollbar
+  const bp = window.innerWidth;        // matches CSS media queries
+  const vh = window.innerHeight;
+  const pad = clamp(bp * 0.04, 16, 48);
+  const content = Math.min(vw, 1600) - 2 * pad;
+  const gap = bp <= 760 ? 16 : 28;
+  const perView = bp >= 1100 ? 3 : bp > 760 ? 2 : 1.15;
+  const cardW = (content - (perView - 1) * gap) / perView;
+  const cards = track.querySelectorAll(".card:not(.contact-card)").length;
+
+  track.style.setProperty("--card-gap", `${gap}px`);
+  track.style.setProperty("--card-w", `${cardW}px`);
+  track.style.setProperty("--contact-w", `${content}px`); // three card spaces on desktop
+  pin.style.setProperty("--window-w", `${content}px`);
+
+  // Sideways distance until the contact card fills the window exactly.
+  travel = cards * (cardW + gap);
+  holdStart = vh * 0.15;
+  const holdEnd = vh * 0.25;
+  projects.style.height = `${vh + holdStart + travel + holdEnd}px`;
+}
+
+function onScroll() {
+  const vh = window.innerHeight;
+
+  // Frames 1 → 2: toggle the about state, then fade the stage out completely.
+  const scrollable = intro.offsetHeight - vh;
+  const p = clamp(-intro.getBoundingClientRect().top / scrollable, 0, 1);
+  stage.classList.toggle("is-about", p > 0.3);
+  const shrink = clamp((p - 0.72) / 0.2, 0, 1);
+  stage.style.setProperty("--shrink", shrink.toFixed(3));
+  stage.style.visibility = shrink >= 1 ? "hidden" : "";
+
+  // Frame 3: cards rise in, then vertical scroll drives them sideways.
+  const top = projects.getBoundingClientRect().top;
+  if (top < vh * 0.6) projects.classList.add("in");
+  const x = clamp(-top - holdStart, 0, travel);
+  track.style.setProperty("--track-x", x.toFixed(1));
+}
+
+// Contact lives at the end of the horizontal track, so jump to the end of the section.
+document.querySelectorAll('a[href="#contact"]').forEach((a) =>
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: projects.offsetTop + projects.offsetHeight - window.innerHeight });
+  })
+);
+
+window.addEventListener("scroll", onScroll, { passive: true });
+window.addEventListener("resize", () => { layout(); onScroll(); });
+layout();
+onScroll();
+
+document.getElementById("year").textContent = new Date().getFullYear();
