@@ -3,12 +3,14 @@ const stage = document.getElementById("stage");
 const projects = document.getElementById("projects");
 const pin = projects.querySelector(".projects-pin");
 const track = document.getElementById("track");
+const head = projects.querySelector(".projects-head");
 
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
 // Horizontal-scroll geometry, recomputed on resize.
 let travel = 0;     // px the track moves sideways
 let holdStart = 0;  // px of vertical scroll before the track starts moving
+let lastStep = 1;   // px of the final slide that brings the contact card in
 let vertical = false; // phones: plain vertical list instead of the horizontal track
 
 function layout() {
@@ -24,6 +26,7 @@ function layout() {
     travel = 0;
     projects.style.height = "";
     track.style.removeProperty("--track-x");
+    pin.style.removeProperty("--contact-in");
     return;
   }
 
@@ -41,6 +44,7 @@ function layout() {
 
   // Sideways distance until the contact card fills the window exactly.
   travel = cards * (cardW + gap);
+  lastStep = cardW + gap;
   holdStart = vh * 0.15;
   const holdEnd = vh * 0.25;
   projects.style.height = `${vh + holdStart + travel + holdEnd}px`;
@@ -86,8 +90,8 @@ function onScroll() {
   // panel is halfway faded, so cards never sit on top of it) and drops back out
   // when scrolled away above that point.
   if (vertical) {
-    for (const card of track.children)
-      card.classList.toggle("in", shrink >= 0.5 && card.getBoundingClientRect().top < vh * 0.92);
+    for (const el of [head, ...track.children])
+      el.classList.toggle("in", shrink >= 0.5 && el.getBoundingClientRect().top < vh * 0.92);
     return;
   }
 
@@ -97,6 +101,8 @@ function onScroll() {
   let x = clamp(-top - holdStart, 0, travel);
   if (travel - x < 1) x = travel;  // fractional scroll positions can stop a hair short
   track.style.setProperty("--track-x", x.toFixed(1));
+  // the header fades out during the last slide, as the contact card comes in
+  pin.style.setProperty("--contact-in", clamp((x - (travel - lastStep)) / lastStep, 0, 1).toFixed(3));
 }
 
 // Contact lives at the end of the horizontal track, so jump to the end of the section.

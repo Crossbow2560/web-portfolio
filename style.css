@@ -312,16 +312,36 @@ strong { color: var(--accent-2); font-weight: 600; }
   height: 100vh;
   overflow: hidden;
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 96px 0 40px;
   pointer-events: none;  /* overlaps the about fade-out; only the cards take clicks */
+}
+
+/* section header: lines up with the cards' left edge, stays put while they slide,
+   rises in with them, and fades out as the contact card arrives (--contact-in) */
+.projects-head {
+  width: var(--window-w, 100%);
+  margin-bottom: clamp(4px, 1.2vh, 12px);
+  opacity: 0;
+  transform: translateY(120px);
+  transition: transform 0.8s var(--ease), opacity 0.8s var(--ease);
+}
+.projects.in .projects-head { opacity: 1; transform: none; }
+.projects-head h2 {
+  font-family: var(--pixel-font);
+  font-size: clamp(18px, 2.2vw, 30px);
+  line-height: 1.4;
+  opacity: calc(1 - var(--contact-in, 0));
 }
 .card { pointer-events: auto; }
 /* clips the track to the content area; padding leaves room for the pixel shadows */
 .track-window {
   --shadow-room: 16px;
   width: calc(var(--window-w, 100%) + 2 * var(--shadow-room));
-  height: min(100%, 790px);
+  flex: 0 1 790px;          /* takes the height left under the header, up to 790px */
+  min-height: 0;
   margin: 0 auto;
   padding: var(--shadow-room);
   overflow: hidden;
@@ -463,6 +483,8 @@ strong { color: var(--accent-2); font-weight: 600; }
     display: block;
     padding: 96px 16px 48px;
   }
+  .projects-head { width: auto; margin-bottom: 20px; }
+  .projects-head.in { opacity: 1; transform: none; }
   .track-window { width: auto; height: auto; padding: 0; overflow: visible; }
   .track { flex-direction: column; height: auto; gap: 24px; transform: none; }
   .card { flex: none; }
