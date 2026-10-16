@@ -403,6 +403,24 @@ strong { color: var(--accent-2); font-weight: 600; }
   .stage.is-skills .about { transform: translateX(calc(100% + 50vw)); }
   .stage.is-skills .skills { transform: none; }
   .panel h2 { font-size: 18px; }
+
+  /* projects: a plain vertical list on phones (no pinning, no sideways track) */
+  .projects-pin {
+    position: static;
+    height: auto;
+    overflow: visible;
+    display: block;
+    padding: 96px 16px 48px;
+  }
+  .track-window { width: auto; height: auto; padding: 0; overflow: visible; }
+  .track { flex-direction: column; height: auto; gap: 24px; transform: none; }
+  .card { flex: none; }
+  .thumb { flex: none; aspect-ratio: 16 / 10; }
+  /* the last card fills the screen below the nav, like it fills the track on desktop */
+  /* extra space above it (112px in all with the gap) keeps the previous card,
+     including its pixel border and shadow, off screen once it lands below the nav */
+  .contact-card { flex-basis: auto; min-height: calc(100vh - 96px - 48px); margin-top: 88px; }
+  .card.in { opacity: 1; transform: none; }
 }
 
 /* very short phones: tighten the about panel so it fits */

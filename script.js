@@ -9,11 +9,22 @@ const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 // Horizontal-scroll geometry, recomputed on resize.
 let travel = 0;     // px the track moves sideways
 let holdStart = 0;  // px of vertical scroll before the track starts moving
+let vertical = false; // phones: plain vertical list instead of the horizontal track
 
 function layout() {
   const vw = pin.clientWidth;          // excludes the scrollbar
   const bp = window.innerWidth;        // matches CSS media queries
   const vh = window.innerHeight;
+
+  vertical = bp <= 760;  // matches the phone media query in style.css
+  projects.classList.toggle("is-vertical", vertical);
+  if (vertical) {
+    travel = 0;
+    projects.style.height = "";
+    track.style.removeProperty("--track-x");
+    return;
+  }
+
   const pad = clamp(bp * 0.04, 16, 48);
   const content = Math.min(vw, 1600) - 2 * pad;
   const gap = bp <= 760 ? 16 : 28;
@@ -47,6 +58,15 @@ function onScroll() {
   stage.style.setProperty("--shrink", shrink.toFixed(3));
   stage.style.visibility = shrink >= 1 ? "hidden" : "";
 
+  // Phones: each card rises in as it scrolls into view (not before the skills
+  // panel is halfway faded, so cards never sit on top of it).
+  if (vertical) {
+    if (shrink < 0.5) return;
+    for (const card of track.children)
+      if (card.getBoundingClientRect().top < vh * 0.92) card.classList.add("in");
+    return;
+  }
+
   // Frame 3: cards rise in, then vertical scroll drives them sideways.
   const top = projects.getBoundingClientRect().top;
   if (top < vh * 0.6) projects.classList.add("in");
@@ -59,7 +79,10 @@ function onScroll() {
 document.querySelectorAll('a[href="#contact"]').forEach((a) =>
   a.addEventListener("click", (e) => {
     e.preventDefault();
-    window.scrollTo({ top: projects.offsetTop + projects.offsetHeight - window.innerHeight });
+    const top = vertical
+      ? document.getElementById("contact").getBoundingClientRect().top + window.scrollY - 96
+      : projects.offsetTop + projects.offsetHeight - window.innerHeight;
+    window.scrollTo({ top });
   })
 );
 
