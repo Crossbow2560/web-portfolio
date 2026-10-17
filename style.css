@@ -225,6 +225,18 @@ strong { color: var(--accent-2); font-weight: 600; }
 }
 @keyframes bob { 50% { transform: translateY(6px); } }
 
+/* first load / reload: the portrait slides up from the bottom, the left text in from
+   the left, the right text in from the right. Uses the separate `translate` property so
+   it stacks on top of each piece's own `transform` positioning (desktop and phone).
+   Fill mode is backwards only: once played, the animation lets go entirely, so the
+   scroll-driven states (about, skills, the phone fade) behave exactly as before. */
+@keyframes hero-in-left   { from { translate: -60vw 0; opacity: 0; } }
+@keyframes hero-in-right  { from { translate: 60vw 0;  opacity: 0; } }
+@keyframes hero-in-bottom { from { translate: 0 100%;  opacity: 0; } }
+.avatar:not(.avatar-about) { animation: hero-in-bottom 1s var(--ease) backwards; }
+.hero-left  { animation: hero-in-left 1s var(--ease) 0.15s backwards; }
+.hero-right { animation: hero-in-right 1s var(--ease) 0.25s backwards; }
+
 /* side panels (about, skills) share one style */
 .panel {
   right: clamp(16px, 4vw, 48px);
@@ -532,6 +544,10 @@ strong { color: var(--accent-2); font-weight: 600; }
   .intro .stage > .avatar:not(.avatar-about) {
     position: sticky;
     top: var(--stick-top, 0);
+    /* the hero comes in with the load slides (hero-in-*), so it skips the rise-in */
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
   }
   /* the fade uses filter, not opacity, so it follows the finger instead of easing
      behind it (opacity keeps its transition for the rise-in on load) */
