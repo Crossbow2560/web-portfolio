@@ -502,6 +502,28 @@ strong { color: var(--accent-2); font-weight: 600; }
   }
   .intro .stage > .in { opacity: 1; transform: none; pointer-events: auto; }
 
+  /* hero → About: the hero (text + portrait) stays pinned where it sits and fades out
+     as About and its portrait scroll up over it. --stick-top and the hero opacity are
+     set in script.js; About and its portrait skip the rise-in (the scroll is the slide). */
+  .intro .stage > .hero-left,
+  .intro .stage > .hero-right,
+  .intro .stage > .avatar:not(.avatar-about) {
+    position: sticky;
+    top: var(--stick-top, 0);
+  }
+  /* the fade uses filter, not opacity, so it follows the finger instead of easing
+     behind it (opacity keeps its transition for the rise-in on load) */
+  .intro .stage > .hero-left,
+  .intro .stage > .hero-right { filter: opacity(var(--hero-fade, 1)); }
+  .intro .stage > .avatar:not(.avatar-about) {
+    filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.45)) opacity(var(--hero-fade, 1));
+  }
+  .stage.hero-gone > .hero-left,
+  .stage.hero-gone > .hero-right,
+  .stage.hero-gone > .avatar:not(.avatar-about) { pointer-events: none; }
+  .intro .stage > .about,
+  .intro .stage > .avatar-about { opacity: 1; transform: none; pointer-events: auto; z-index: 1; }
+
   .hero-left { order: 1; width: auto; max-width: none; margin-top: 96px; font-size: 16px; }
   .hero-left h1 { font-size: 26px; margin: 4px 0 6px; }
   .hero-right { order: 2; width: auto; margin-top: 16px; font-size: 15px; }
@@ -514,7 +536,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 
   .anchor { position: static; scroll-margin-top: 88px; }  /* nav targets, clear of the top bar */
   #about { order: 4; }
-  .about { order: 5; margin-top: 72px; }
+  .about { order: 5; margin-top: var(--about-gap, 72px); }
   .intro .stage > .avatar-about { display: block; order: 6; margin-top: 40px; }  /* room for the bubble tail */
   .avatar-about img { height: min(40vh, 320px); }
   #skills { order: 7; }

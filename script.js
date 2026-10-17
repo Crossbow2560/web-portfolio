@@ -21,6 +21,25 @@ function layout() {
 
   vertical = bp <= 760;  // matches the phone media query in style.css
   projects.classList.toggle("is-vertical", vertical);
+  // Phones: pin each hero piece at the spot it naturally occupies at the top of the
+  // page (the intro starts at y = 0, so that's its margin plus everything above it).
+  const heroEls = [".hero-left", ".hero-right", ".avatar:not(.avatar-about)"].map((s) => stage.querySelector(s));
+  if (vertical) {
+    let y = 0;
+    for (const el of heroEls) {
+      y += parseFloat(getComputedStyle(el).marginTop);
+      el.style.setProperty("--stick-top", `${y}px`);
+      y += el.offsetHeight;
+    }
+    // About starts just below the first screen, so it slides in from the bottom
+    stage.style.setProperty("--about-gap", `${Math.max(72, window.innerHeight - y)}px`);
+  } else {
+    stage.style.removeProperty("--about-gap");
+    for (const el of heroEls) el.style.removeProperty("--stick-top");
+    stage.style.removeProperty("--hero-fade");
+    stage.classList.remove("hero-gone");
+  }
+
   if (vertical) {
     travel = 0;
     projects.style.height = "";
@@ -58,6 +77,13 @@ function onScroll() {
     stage.classList.remove("is-about", "is-skills");
     stage.style.removeProperty("--shrink");
     stage.style.visibility = "";
+    // hero → About: the hero fades from full as About's top enters at the bottom of
+    // the screen, to gone when it's 40% of the way down — before About's portrait
+    // reaches the hero portrait, so the faded hero never shows through it.
+    const aboutTop = stage.querySelector(".about").getBoundingClientRect().top;
+    const fade = clamp((aboutTop - vh * 0.4) / (vh * 0.6), 0, 1);
+    stage.style.setProperty("--hero-fade", fade.toFixed(3));
+    stage.classList.toggle("hero-gone", fade < 0.05);
     for (const el of [...stage.children, head, ...track.children])
       el.classList.toggle("in", el.getBoundingClientRect().top < vh * 0.92);
     // dead end: the contact card is fully on screen
