@@ -271,21 +271,23 @@
         <article class="card project px-box">
           <div class="thumb">05</div>  <!-- swap for <img src="…" alt="…"> -->
           <div class="card-body">
-            <h3>Project Five</h3>
-            <p class="brief">One or two lines on what it is and the problem it solves.</p>
+            <h3>AgentSecureBench</h3>
+            <p class="brief">A Python framework for security-testing LLM agents against the OWASP Top 10 for Agentic Applications. Built as a team at PES Innovation Lab.</p>
             <div class="card-section">
               <h4>Stack</h4>
-              <ul class="tags"><li>Python</li><li>ROS</li><li>OpenCV</li></ul>
+              <ul class="tags"><li>Python</li><li>Pydantic</li><li>OpenAI</li><li>Anthropic</li><li>Gemini</li><li>Ollama</li><li>llama.cpp</li></ul>
             </div>
             <div class="card-section">
               <h4>Highlights</h4>
               <ul class="features">
-                <li>Headline feature: what it does</li>
-                <li>A measurable result, e.g. 2× faster</li>
-                <li>What makes it stand out</li>
+                <li>One adapter interface for OpenAI, Anthropic, Gemini, Ollama and llama.cpp: swap the model without touching the agent</li>
+                <li>Every LLM call, tool call and memory change is logged and fully replayable, with per-message provenance</li>
+                <li>Persistent agent memory with keyword or embedding search, used to test memory and context poisoning</li>
+                <li>Memory-poisoning benchmark of 200 attack / benign prompt pairs, run model by model in batches</li>
+                <li>Tool registry with risk tiers and provider-native tool schemas</li>
               </ul>
             </div>
-            <a href="#" class="px-btn view">View project →</a>
+            <span class="px-btn view static">Private repository</span>
           </div>
         </article>
         <!-- "More Projects" strip: opens the drawer of extra project cards that follows it -->
