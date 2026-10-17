@@ -616,17 +616,28 @@ strong { color: var(--accent-2); font-weight: 600; }
 .mini-card:nth-child(3n + 2) { --col: 2; }
 .mini-card:nth-child(3n) { --col: 3; }
 .more-strip.is-open + .more-drawer .mini-card { transform: none; }
-.mini-card .thumb { flex: 1; height: auto; min-height: 0; font-size: clamp(18px, 1.8vw, 26px); }
-.mini-body { padding: clamp(10px, 1.1vw, 16px); }
+.mini-body { padding: clamp(14px, 1.4vw, 22px); }   /* small cards have no image, just text */
 .mini-body h3 { font-family: var(--pixel-font); font-size: clamp(10px, 0.9vw, 13px); line-height: 1.4; }
+/* small card: title, a short description (up to two lines), the tech stack and a
+   "View project" button */
+.mini-body { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
+.mini-view {                    /* small "View project" button, pinned to the card's bottom */
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 9px;
+  padding: 8px 10px;
+}
 .mini-body p {
-  margin-top: 4px;
   color: var(--muted);
   font-size: 13px;
-  white-space: nowrap;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
+.mini-body .tags { gap: 6px; }
+.mini-body .tags li { font-size: 11px; }
 /* last card: the GitHub call-to-action, in the accent colour */
 .more-cta {
   justify-content: center;
@@ -772,22 +783,28 @@ strong { color: var(--accent-2); font-weight: 600; }
   .more-strip { flex: none; min-height: 64px; }
   .more-toggle { position: relative; height: 64px; }
   .more-inner { transform: translate(-50%, -50%); flex-direction: row; gap: 14px; font-size: clamp(14px, 4.2vw, 16px); }
-  /* phones: the drawer opens below the bar, two columns, cards dropping in from it */
+  /* phones: the drawer opens below the bar as a single column of full-width cards,
+     spaced like the project list above it, each dropping in a beat after the last */
   .more-drawer { display: none; flex: none; margin: 0; clip-path: none; visibility: visible; transition: none; }
   .more-strip.is-open + .more-drawer { display: block; }
   .more-grid {
     position: static;
     width: auto;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: none;
-    gap: 16px;
+    grid-auto-rows: 1fr;      /* every card as tall as the tallest, GitHub card included */
+    gap: 24px;
   }
   .mini-card { transform: none; transition: none; }
   .more-strip.is-open + .more-drawer .mini-card { animation: mini-drop 0.45s var(--ease) backwards; }
-  .more-strip.is-open + .more-drawer .mini-card:nth-child(n + 3) { animation-delay: 0.06s; }
-  .more-strip.is-open + .more-drawer .mini-card:nth-child(n + 5) { animation-delay: 0.12s; }
-  .mini-card .thumb { flex: none; height: 72px; }
-  .more-cta { min-height: 140px; }
+  .more-strip.is-open + .more-drawer .mini-card:nth-child(2) { animation-delay: 0.05s; }
+  .more-strip.is-open + .more-drawer .mini-card:nth-child(3) { animation-delay: 0.1s; }
+  .more-strip.is-open + .more-drawer .mini-card:nth-child(4) { animation-delay: 0.15s; }
+  .more-strip.is-open + .more-drawer .mini-card:nth-child(5) { animation-delay: 0.2s; }
+  .more-strip.is-open + .more-drawer .mini-card:nth-child(6) { animation-delay: 0.25s; }
+  .mini-body { padding: 16px 20px 20px; }
+  .mini-body h3 { font-size: 14px; }
+
   .card.in { opacity: 1; transform: none; }
 }
 
