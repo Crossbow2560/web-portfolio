@@ -170,6 +170,7 @@ strong { color: var(--accent-2); font-weight: 600; }
   filter: drop-shadow(0 0 30px rgba(0, 0, 0, 0.45));
 }
 .avatar img { height: var(--av-h); width: auto; }
+.avatar-about { display: none; }  /* phones only */
 
 /* side text hugs the portrait's edges rather than the page edges */
 .hero-left {
@@ -485,51 +486,41 @@ strong { color: var(--accent-2); font-weight: 600; }
   .topbar nav { gap: clamp(12px, 4vw, 20px); padding: 14px 16px; }
   .topbar nav a { font-size: 8px; }
 
-  /* portrait fills whatever height is left under the hero text */
-  .avatar img { height: max(160px, min(48vh, calc(100vh - 400px))); }
-  .hero-left {
-    top: 96px;
-    left: 16px;
-    right: auto;
-    transform: none;
-    width: auto;
-    max-width: none;
-    font-size: 16px;
+  /* intro: a plain vertical flow on phones (no pinned, scroll-driven stage).
+     The stage box is dissolved so its children stack inside .intro:
+     hero text → portrait → About → portrait → Skills. Each one rises in as it
+     scrolls into view (.in is set in script.js). */
+  .intro { height: auto; display: flex; flex-direction: column; }
+  .stage { display: contents; }
+  .intro .stage > * {
+    position: relative;
+    inset: auto;
+    margin-inline: 16px;
+    opacity: 0;
+    transform: translateY(60px);
+    pointer-events: none;
   }
-  .hero-left h1 { font-size: 26px; }
-  .hero-left h1 { margin: 4px 0 6px; }
-  .hero-right {
-    top: 245px;
-    left: 16px;
-    right: 16px;
-    transform: none;
-    width: auto;
-    font-size: 15px;
-  }
+  .intro .stage > .in { opacity: 1; transform: none; pointer-events: auto; }
+
+  .hero-left { order: 1; width: auto; max-width: none; margin-top: 96px; font-size: 16px; }
+  .hero-left h1 { font-size: 26px; margin: 4px 0 6px; }
+  .hero-right { order: 2; width: auto; margin-top: 16px; font-size: 15px; }
   .hint { margin-top: 12px; }
 
-  .stage.is-about::before { left: 50%; }
-  /* portrait stays at the bottom, scaled to fill the space left under each panel
-     (--av-scale-* are measured in script.js) */
-  .stage.is-about .avatar { left: 50%; transform: translateX(-50%) scale(var(--av-scale-about, 0.55)); }
-  .stage.is-about .hero-left { transform: translateX(calc(-100% - 40px)); }
-  .stage.is-about .hero-right { transform: translateY(60vh); }
+  .intro .stage > .avatar { align-self: center; margin-top: 24px; }
+  .avatar:not(.avatar-about) { order: 3; }
+  /* hero portrait roughly fills what's left of the first screen */
+  .avatar img { height: max(160px, min(48vh, calc(100vh - 400px))); }
 
-  .panel {
-    top: 88px;
-    left: 16px;
-    right: 16px;
-    width: auto;
-    padding: 22px;
-    font-size: 15px;
-    transform: translateX(calc(100% + 40px));
-  }
-  .stage.is-about .about { transform: none; }
-  .skills { transform: translateX(calc(-100% - 50vw)); }
-  .stage.is-skills::before { left: 50%; }
-  .stage.is-skills .avatar { left: 50%; transform: translateX(-50%) scale(var(--av-scale-skills, 0.55)); }
-  .stage.is-skills .about { transform: translateX(calc(100% + 50vw)); }
-  .stage.is-skills .skills { transform: none; }
+  .anchor { position: static; scroll-margin-top: 88px; }  /* nav targets, clear of the top bar */
+  #about { order: 4; }
+  .about { order: 5; margin-top: 72px; }
+  .intro .stage > .avatar-about { display: block; order: 6; margin-top: 40px; }  /* room for the bubble tail */
+  .avatar-about img { height: min(40vh, 320px); }
+  #skills { order: 7; }
+  .skills { order: 8; margin-top: 72px; }
+
+  .panel { width: auto; padding: 22px; font-size: 15px; }
   .panel h2 { font-size: 18px; }
   /* tail turns to point down at the portrait (rotation keeps the outline right) */
   .bubble-tail {
@@ -547,6 +538,7 @@ strong { color: var(--accent-2); font-weight: 600; }
   }
 
   /* projects: a plain vertical list on phones (no pinning, no sideways track) */
+  .projects { margin-top: 0; }
   .projects-pin {
     position: static;
     height: auto;
@@ -573,7 +565,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 /* very short phones: tighten the about panel and contact card so they fit */
 @media (max-width: 760px) and (max-height: 600px) {
   .contact-card { gap: 16px; padding: 20px; }
-  .panel { top: 76px; padding: 16px; font-size: 14px; line-height: 1.55; }
+  .panel { padding: 16px; font-size: 14px; line-height: 1.55; }
   .panel h2 { font-size: 15px; }
 }
 
