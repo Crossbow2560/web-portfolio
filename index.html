@@ -65,13 +65,13 @@
         <h2>Skills</h2>
         <dl>
           <dt>Languages</dt>
-          <dd>Python, C, C++, <strong>TypeScript</strong></dd>
+          <dd>C, C++, TypeScript, <strong>Python</strong></dd>
           <dt>Hardware</dt>
-          <dd><strong>STM32</strong>, ESP32, KiCad, soldering</dd>
-          <dt>Tools</dt>
-          <dd>Linux, Git, Docker, <strong>ROS</strong></dd>
-          <dt>CAD / Fab</dt>
-          <dd>Fusion 360, 3D printing</dd>
+          <dd><strong>ESP32</strong>, Raspberry Pi, ESP32, KiCad, soldering </dd>
+          <dt>Infra</dt>
+          <dd>Git, Docker, Cloudflare, MinIO, <strong>Linux</strong></dd>
+          <dt>Frameworks</dt>
+          <dd><strong>NextJS</strong>, React, Express, HTML5, CSS</dd>
         </dl>
       </div>
       </div>
@@ -88,7 +88,7 @@
       <div class="track-window">
       <div class="track" id="track">
         <article class="card project px-box">
-          <div class="thumb">01</div>  <!-- swap for <img src="…" alt="…"> -->
+          <div class="thumb"><img src="assets/projects/dbase.webp" alt="DBase landing page: “Simple file storage you control.” beside a file browser showing a folder and a JSON file" width="1200" height="389" loading="lazy" style="object-position: 20% 50%" /></div>
           <div class="card-body">
             <h3>DBase</h3>
             <p class="brief">A self-hosted file storage and sharing app, like a small Google Drive you run on your own server.</p>
@@ -110,7 +110,7 @@
           </div>
         </article>
         <article class="card project px-box">
-          <div class="thumb">02</div>  <!-- swap for <img src="…" alt="…"> -->
+          <div class="thumb"><img src="assets/projects/cabo.webp" alt="Cabo title screen: the CABO logo over a desert sunset, with the tagline “The lowest hand wins, partner.” and a Play Now button" width="1200" height="400" loading="lazy" style="object-position: 50% 41%" /></div>
           <div class="card-body">
             <h3>Cabo</h3>
             <p class="brief">Real-time multiplayer Cabo, the memory card game where the lowest hand wins. Start a room, share the link and play with friends in the browser.</p>
@@ -132,43 +132,47 @@
           </div>
         </article>
         <article class="card project px-box">
-          <div class="thumb">03</div>  <!-- swap for <img src="…" alt="…"> -->
+          <div class="thumb"><img src="assets/projects/car-simulator.webp" alt="The car simulator rig: a steering wheel on its column mounted to an aluminium frame, with the pedal assembly and Arduino wiring behind it" width="1200" height="400" loading="lazy" style="object-position: 30% 50%" /></div>
           <div class="card-body">
-            <h3>Project Three</h3>
-            <p class="brief">One or two lines on what it is and the problem it solves.</p>
+            <h3>Car Simulator</h3>
+            <p class="brief">A home-built driving rig with a real steering wheel and pedals. An Arduino reads every control and a Python script turns it into a virtual game controller.</p>
             <div class="card-section">
               <h4>Stack</h4>
-              <ul class="tags"><li>TypeScript</li><li>WebGL</li><li>Vite</li></ul>
+              <ul class="tags"><li>Arduino UNO</li><li>C++</li><li>Python</li><li>ViGEmBus</li></ul>
             </div>
             <div class="card-section">
               <h4>Highlights</h4>
               <ul class="features">
-                <li>Headline feature: what it does</li>
-                <li>A measurable result, e.g. 2× faster</li>
-                <li>What makes it stand out</li>
+                <li>Seven controls: accelerator, brake, clutch, steering, gear up, gear down and handbrake</li>
+                <li>Rotary encoder reads the steering; potentiometers give variable accelerator and brake</li>
+                <li>Clutch, gear shifters and handbrake run on limit switches</li>
+                <li>Arduino streams every reading to Python over serial</li>
+                <li>Games see it as a regular controller through a virtual gamepad</li>
               </ul>
             </div>
-            <a href="#" class="px-btn view">View project →</a>
+            <a href="https://github.com/Crossbow2560/Car-Simulator" class="px-btn view" target="_blank" rel="noopener">View project →</a>
           </div>
         </article>
         <article class="card project px-box">
-          <div class="thumb">04</div>  <!-- swap for <img src="…" alt="…"> -->
+          <div class="thumb"><img src="assets/projects/agritech.webp" alt="Agritech landing page: “Intelligence for every acre you grow.” over plantation fields, beside an aerial crop view with a live NDVI reading" width="1200" height="400" loading="lazy" style="object-position: 5% 42%" /></div>
           <div class="card-body">
-            <h3>Project Four</h3>
-            <p class="brief">One or two lines on what it is and the problem it solves.</p>
+            <h3>Agritech</h3>
+            <p class="brief">Farm management and GIS dashboard platform, built as a team and now in production for a Malaysia-based client.</p>
             <div class="card-section">
               <h4>Stack</h4>
-              <ul class="tags"><li>Fusion 360</li><li>3D printing</li><li>Arduino</li></ul>
+              <ul class="tags"><li>Next.js</li><li>TypeScript</li><li>Supabase</li><li>MinIO</li><li>Recharts</li><li>GIS microservices</li></ul>
             </div>
             <div class="card-section">
               <h4>Highlights</h4>
               <ul class="features">
-                <li>Headline feature: what it does</li>
-                <li>A measurable result, e.g. 2× faster</li>
-                <li>What makes it stand out</li>
+                <li>Dashboards for farm overview, crop health and NDVI/NDRE vegetation indices</li>
+                <li>Tracks 14,000+ plants</li>
+                <li>Tiler and Modifier microservices serve geospatial map tiles from MinIO imagery</li>
+                <li>Supabase-backed auth and data persistence</li>
+                <li>Majority of the frontend and backend, as part of the product team</li>
               </ul>
             </div>
-            <a href="#" class="px-btn view">View project →</a>
+            <span class="px-btn view static">Private client project</span>
           </div>
         </article>
         <article class="card project px-box">
