@@ -19,6 +19,7 @@
   --av-h: min(calc(100vh - 110px), calc(var(--W) * 0.34 * 90 / 52));
   --av-half: calc(var(--av-h) * 26 / 90);
   --hero-gap: clamp(24px, 2.4vw, 40px);  /* text ↔ portrait */
+  --strip-w: clamp(64px, 6vw, 96px);     /* "More Projects" strip */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,7 +65,7 @@ strong { color: var(--accent-2); font-weight: 600; }
     0 var(--px) 0 0 var(--line),
     calc(var(--px) * -1) 0 0 0 var(--line),
     var(--px) 0 0 0 var(--line),
-    calc(var(--px) * 2) calc(var(--px) * 2) 0 0 rgba(0, 0, 0, 0.45);
+    var(--drop, calc(var(--px) * 2)) var(--drop, calc(var(--px) * 2)) 0 0 rgba(0, 0, 0, 0.45);
 }
 
 .px-title {
@@ -224,6 +225,7 @@ strong { color: var(--accent-2); font-weight: 600; }
   animation: bob 1.4s steps(2) infinite;
 }
 @keyframes bob { 50% { transform: translateY(6px); } }
+@keyframes mini-drop { from { opacity: 0; transform: translateY(-16px); } }
 
 /* first load / reload: the portrait slides up from the bottom, the left text in from
    the left, the right text in from the right. Uses the separate `translate` property so
@@ -391,12 +393,30 @@ strong { color: var(--accent-2); font-weight: 600; }
   /* rise from the bottom when the section arrives */
   opacity: 0;
   transform: translateY(120px);
-  transition: transform 0.8s var(--ease), opacity 0.8s var(--ease);
+  transition: transform 0.8s var(--ease), opacity 0.8s var(--ease),
+              translate 0.2s ease, box-shadow 0.2s ease;
 }
 .projects.in .card { opacity: 1; transform: none; }
-.projects.in .card:nth-child(2) { transition-delay: 0.08s; }
-.projects.in .card:nth-child(3) { transition-delay: 0.16s; }
-.projects.in .card:nth-child(n + 4) { transition-delay: 0.24s; }
+/* the rise-in is staggered; the hover lift (3rd/4th) never waits */
+.projects.in .card:nth-child(2) { transition-delay: 0.08s, 0.08s, 0s, 0s; }
+.projects.in .card:nth-child(3) { transition-delay: 0.16s, 0.16s, 0s, 0s; }
+.projects.in .card:nth-child(n + 4) { transition-delay: 0.24s, 0.24s, 0s, 0s; }
+
+/* hover: project cards, the More Projects strip and the drawer's cards lift a little and
+   cast a deeper pixel shadow. Uses `translate`, so it never fights the rise-in or drawer
+   slides (which use `transform`). Only on devices that really hover, so a tap on a
+   phone doesn't leave a card stuck up; keyboard focus inside a card lifts it too. */
+@media (hover: hover) {
+  .card.project:hover,
+  .card.project:has(:focus-visible),   /* keyboard focus only, so a mouse click doesn't leave it up */
+  .more-strip:hover,
+  .more-strip:has(:focus-visible),
+  .mini-card:hover,
+  .mini-card:focus-visible {
+    translate: 0 -6px;
+    --drop: calc(var(--px) * 3);
+  }
+}
 
 /* project card: small image, title, brief, stack, highlights, view button */
 .thumb {
@@ -505,6 +525,125 @@ strong { color: var(--accent-2); font-weight: 600; }
   transition: transform 0.6s var(--ease);   /* plain slide, no overshoot */
 }
 .contact-done .contact-card .contact-head h2 { transform: none; }
+
+/* "More Projects" strip after the last project: slim and full-height, with the label
+   running bottom-to-top and a "+" beside it. Clicking it opens the drawer that follows it
+   in the track (script.js). On phones it becomes a bar. */
+.more-strip {
+  flex: 0 0 var(--strip-w);
+  position: relative;
+  color: var(--text);
+}
+.more-toggle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+}
+.more-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  font-family: var(--pixel-font);
+  font-size: clamp(16px, 1.6vw, 24px);
+  line-height: 1;            /* the page's 1.7 would make the rotated label too thick */
+  letter-spacing: 0.2em;
+}
+.more-plus {
+  font-size: 1.5em;
+  letter-spacing: 0;
+  color: var(--accent-2);
+  transition: transform 0.4s var(--ease);
+}
+.more-strip.is-open .more-plus { transform: rotate(45deg); }   /* + becomes × */
+.more-toggle:hover .more-label,
+.more-toggle:focus-visible .more-label,
+.more-strip.is-open .more-label { color: var(--accent-2); }
+
+/* the drawer: its own item in the track, right after the strip. Closed it takes no room
+   (0 width, and a negative margin cancels the track gap before it); open it is exactly
+   the rest of the card window beside the strip, so the section physically gets longer
+   (script.js adds it to the scroll length). The 3 × 2 grid inside keeps that full width
+   and the drawer clips it on the left (leaving room for the cards' pixel border), so as
+   the drawer widens the cards slide out from behind the strip, in step with it (same
+   duration and easing). */
+.more-drawer {
+  --drawer-w: calc(var(--window-w, 100vw) - var(--strip-w) - var(--card-gap, 28px));
+  position: relative;
+  flex: 0 0 0px;
+  margin-left: calc(-1 * var(--card-gap, 28px));
+  clip-path: inset(-16px -16px -16px calc(-1 * var(--px)));   /* room for the cards' 4px left border */
+  visibility: hidden;
+  transition: flex-basis 0.6s var(--ease), margin-left 0.6s var(--ease), visibility 0s linear 0.6s;
+}
+.more-strip.is-open + .more-drawer {
+  flex-basis: var(--drawer-w);
+  margin-left: 0;
+  visibility: visible;
+  pointer-events: auto;      /* the projects frame lets clicks through; the open drawer takes them */
+  transition-delay: 0s;
+}
+.more-grid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--drawer-w);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));   /* minmax: let the one-line text shrink */
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: var(--card-gap, 28px);
+}
+.mini-card {
+  --col: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* start tucked behind the strip: shifted left by its column's distance */
+  transform: translateX(calc(var(--col) * (-100% - var(--card-gap, 28px))));
+  transition: transform 0.6s var(--ease), translate 0.2s ease, box-shadow 0.2s ease;
+}
+.mini-card:nth-child(3n + 2) { --col: 2; }
+.mini-card:nth-child(3n) { --col: 3; }
+.more-strip.is-open + .more-drawer .mini-card { transform: none; }
+.mini-card .thumb { flex: 1; height: auto; min-height: 0; font-size: clamp(18px, 1.8vw, 26px); }
+.mini-body { padding: clamp(10px, 1.1vw, 16px); }
+.mini-body h3 { font-family: var(--pixel-font); font-size: clamp(10px, 0.9vw, 13px); line-height: 1.4; }
+.mini-body p {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* last card: the GitHub call-to-action, in the accent colour */
+.more-cta {
+  justify-content: center;
+  gap: 12px;
+  padding: clamp(14px, 1.6vw, 24px);
+  background: var(--accent);
+  color: var(--text);
+  text-decoration: none;
+  box-shadow:
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 0 rgba(0, 0, 0, 0.35),
+    inset var(--px) var(--px) 0 0 rgba(255, 255, 255, 0.2),
+    var(--drop, calc(var(--px) * 2)) var(--drop, calc(var(--px) * 2)) 0 0 rgba(0, 0, 0, 0.45);
+}
+.cta-q { font-family: var(--pixel-font); font-size: clamp(12px, 1.2vw, 18px); line-height: 1.4; }
+.cta-go { font-size: clamp(13px, 1vw, 15px); }
+.more-cta:hover .cta-go,
+.more-cta:focus-visible .cta-go { text-decoration: underline; }
 
 .contact-card {
   position: relative;
@@ -630,6 +769,25 @@ strong { color: var(--accent-2); font-weight: 600; }
   .contact-card { flex-basis: auto; min-height: calc(100vh - 140px - 48px); margin-top: 132px; }
   .contact-head { --contact-head-gap: 14px; }
   .contact-card .contact-head h2 { font-size: 18px; }
+  .more-strip { flex: none; min-height: 64px; }
+  .more-toggle { position: relative; height: 64px; }
+  .more-inner { transform: translate(-50%, -50%); flex-direction: row; gap: 14px; font-size: clamp(14px, 4.2vw, 16px); }
+  /* phones: the drawer opens below the bar, two columns, cards dropping in from it */
+  .more-drawer { display: none; flex: none; margin: 0; clip-path: none; visibility: visible; transition: none; }
+  .more-strip.is-open + .more-drawer { display: block; }
+  .more-grid {
+    position: static;
+    width: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    gap: 16px;
+  }
+  .mini-card { transform: none; transition: none; }
+  .more-strip.is-open + .more-drawer .mini-card { animation: mini-drop 0.45s var(--ease) backwards; }
+  .more-strip.is-open + .more-drawer .mini-card:nth-child(n + 3) { animation-delay: 0.06s; }
+  .more-strip.is-open + .more-drawer .mini-card:nth-child(n + 5) { animation-delay: 0.12s; }
+  .mini-card .thumb { flex: none; height: 72px; }
+  .more-cta { min-height: 140px; }
   .card.in { opacity: 1; transform: none; }
 }
 

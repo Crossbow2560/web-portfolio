@@ -195,6 +195,56 @@
             <a href="#" class="px-btn view">View project →</a>
           </div>
         </article>
+        <!-- "More Projects" strip: opens the drawer of extra project cards that follows it -->
+        <div class="card more-strip px-box" id="more">
+          <button class="more-toggle" type="button" aria-expanded="false" aria-controls="more-panel" aria-label="More projects">
+            <span class="more-inner" aria-hidden="true"><span class="more-label">More Projects</span><span class="more-plus">+</span></span>
+          </button>
+        </div>
+        <!-- the drawer is part of the track: opening it physically extends the section -->
+        <div class="more-drawer" id="more-panel" role="region" aria-label="More projects">
+          <div class="more-grid">
+              <article class="mini-card px-box">
+                <div class="thumb">06</div>
+                <div class="mini-body">
+                  <h3>Project Six</h3>
+                  <p>One line on what it is.</p>
+                </div>
+              </article>
+              <article class="mini-card px-box">
+                <div class="thumb">07</div>
+                <div class="mini-body">
+                  <h3>Project Seven</h3>
+                  <p>One line on what it is.</p>
+                </div>
+              </article>
+              <article class="mini-card px-box">
+                <div class="thumb">08</div>
+                <div class="mini-body">
+                  <h3>Project Eight</h3>
+                  <p>One line on what it is.</p>
+                </div>
+              </article>
+              <article class="mini-card px-box">
+                <div class="thumb">09</div>
+                <div class="mini-body">
+                  <h3>Project Nine</h3>
+                  <p>One line on what it is.</p>
+                </div>
+              </article>
+              <article class="mini-card px-box">
+                <div class="thumb">10</div>
+                <div class="mini-body">
+                  <h3>Project Ten</h3>
+                  <p>One line on what it is.</p>
+                </div>
+              </article>
+              <a class="mini-card more-cta" href="https://github.com/Crossbow2560" target="_blank" rel="noopener">
+                <span class="cta-q">Looking for more?</span>
+                <span class="cta-go">Go to my GitHub →</span>
+              </a>
+          </div>
+        </div>
         <article class="card contact-card px-box" id="contact" aria-labelledby="contact-title">
           <div class="contact-head"><h2 id="contact-title">Contact Me</h2></div>
           <h2>Let's build something.</h2>

@@ -13,6 +13,8 @@ let travel = 0;     // px the track moves sideways
 let holdStart = 0;  // px of vertical scroll before the track starts moving
 let lastStep = 1;   // px of the final slide that brings the contact card in
 let vertical = false; // phones: plain vertical list instead of the horizontal track
+let trackX = 0;         // current sideways position of the track
+let moreOpen = false;   // "More Projects" drawer open (it lengthens the track)
 
 function layout() {
   const vw = pin.clientWidth;          // excludes the scrollbar
@@ -54,15 +56,21 @@ function layout() {
   const gap = bp <= 760 ? 16 : 28;
   const perView = bp >= 1100 ? 3 : bp > 760 ? 2 : 1.15;
   const cardW = (content - (perView - 1) * gap) / perView;
-  const cards = track.querySelectorAll(".card:not(.contact-card)").length;
 
   track.style.setProperty("--card-gap", `${gap}px`);
   track.style.setProperty("--card-w", `${cardW}px`);
   track.style.setProperty("--contact-w", `${content}px`); // three card spaces on desktop
   pin.style.setProperty("--window-w", `${content}px`);
 
-  // Sideways distance until the contact card fills the window exactly.
-  travel = cards * (cardW + gap);
+  // Sideways distance until the contact card fills the window exactly: everything
+  // before it, card by card (the "More Projects" strip is narrower than a card).
+  travel = [...track.querySelectorAll(".card:not(.contact-card)")]
+    .reduce((sum, card) => sum + card.getBoundingClientRect().width + gap, 0);  // fractional: offsetWidth rounds
+  // the open drawer fills the window beside the strip; use its final width, as it animates
+  if (moreOpen) {
+    const drawerW = content - more.getBoundingClientRect().width - gap;
+    travel += drawerW + gap;
+  }
   lastStep = cardW + gap;
   holdStart = vh * 0.15;
   const holdEnd = vh * 0.25;
@@ -145,11 +153,40 @@ function onScroll() {
   let x = clamp(-top - holdStart, 0, travel);
   if (travel - x < 1) x = travel;  // fractional scroll positions can stop a hair short
   track.style.setProperty("--track-x", x.toFixed(1));
+  trackX = x;
   // the header fades out during the last slide, as the contact card comes in
   pin.style.setProperty("--contact-in", clamp((x - (travel - lastStep)) / lastStep, 0, 1).toFixed(3));
   // dead end: the contact card has fully slid in
   pin.classList.toggle("contact-done", travel > 0 && x >= travel - 1);
 }
+
+// "More Projects" drawer. It's an item in the track, so opening it physically lengthens
+// the projects section (layout() adds its width) and you scroll on through its cards to
+// the contact card. Only the strip itself opens and closes it. On laptops, opening also
+// scrolls the strip to the left edge of the card window so the drawer unfolds in view.
+const more = document.getElementById("more");
+const moreToggle = more.querySelector(".more-toggle");
+
+function setMore(open) {
+  moreOpen = open;
+  more.classList.toggle("is-open", open);
+  moreToggle.setAttribute("aria-expanded", String(open));
+  layout();     // new scroll length (closing never moves the strip: it's still within range)
+  onScroll();
+}
+
+moreToggle.addEventListener("click", () => {
+  if (moreOpen) return setMore(false);
+  setMore(true);
+  if (vertical) return;
+  const edge = track.parentElement.getBoundingClientRect().left + 16;  // window's content edge
+  const stripX = clamp(trackX + more.getBoundingClientRect().left - edge, 0, travel);
+  if (Math.abs(stripX - trackX) > 1)
+    window.scrollTo({
+      top: projects.offsetTop + holdStart + stripX,
+      behavior: reduceMotion.matches ? "instant" : "smooth",
+    });
+});
 
 // Where each nav link lands. Contact lives at the end of the horizontal track
 // (laptops) or the end of the list (phones), so it isn't a plain anchor jump.
