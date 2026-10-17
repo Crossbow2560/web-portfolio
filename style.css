@@ -665,10 +665,11 @@ strong { color: var(--accent-2); font-weight: 600; }
   padding: clamp(24px, 5vw, 64px);
   text-align: center;
 }
-.contact-card h2 {
+.contact-card .contact-lead {
   font-family: var(--pixel-font);
   font-size: clamp(18px, 3vw, 40px);
   line-height: 1.4;
+  color: var(--text);
 }
 .contact-card > p { color: var(--muted); font-size: var(--hero-text); }
 .socials { list-style: none; display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
