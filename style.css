@@ -127,6 +127,20 @@ strong { color: var(--accent-2); font-weight: 600; }
 
 /* ---------- frames 1 & 2: intro ---------- */
 .intro { position: relative; height: 380vh; }
+
+/* nav clicks: the page content (not the nav or the tarmac) fades out, the page jumps,
+   then it fades back in. .is-jumping switches off the sections' own animations for
+   the jump so the destination appears already settled (see script.js). */
+.intro,
+.projects { transition: opacity 0.3s ease; }
+.is-faded .intro,
+.is-faded .projects { opacity: 0; }
+.is-jumping .stage,
+.is-jumping .stage::before,
+.is-jumping .stage > *,
+.is-jumping .card,
+.is-jumping .projects-head,
+.is-jumping .contact-head h2 { transition: none !important; }
 /* nav targets, inside the about and skills stretches (timeline in script.js) */
 .anchor { position: absolute; top: 70vh; }
 .anchor-skills { top: 180vh; }
@@ -341,7 +355,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 .track-window {
   --shadow-room: 16px;
   width: calc(var(--window-w, 100%) + 2 * var(--shadow-room));
-  flex: 0 1 672px;          /* takes the height left under the header, up to 640px cards */
+  flex: 0 1 790px;          /* takes the height left under the header, up to ~760px cards */
   min-height: 0;
   margin: 0 auto;
   padding: var(--shadow-room);
@@ -375,7 +389,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 /* project card: small image, title, brief, stack, highlights, view button */
 .thumb {
   flex: none;
-  height: clamp(72px, 16vh, 160px);   /* deliberately small */
+  height: clamp(64px, 13vh, 140px);   /* deliberately small */
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -400,10 +414,6 @@ strong { color: var(--accent-2); font-weight: 600; }
   color: var(--muted);
   font-size: 14px;
   line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 .card h4 {
   font-family: var(--pixel-font);
@@ -430,13 +440,25 @@ strong { color: var(--accent-2); font-weight: 600; }
   padding: 10px 14px;
 }
 
-/* short laptop screens: tighter card so everything still fits */
+/* auto-fit (script.js fitCards) on laptops: a card that overflows drops highlights from
+   the end (down to two); if any card still overflows, all cards switch to .tight;
+   capping the description (.clamp) is the very last resort */
+.features li.is-cut { display: none; }
+.card.tight h4 { display: none; }
+.card.tight .card-body { gap: 9px; }
+.card.tight .brief { font-size: 13px; }
+.card.tight .features { gap: 3px; font-size: 12.5px; }
+.card.tight .tags li { font-size: 11px; }
+.card.clamp .brief {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* short laptop screens: smaller image strip */
 @media (min-width: 761px) and (max-height: 650px) {
   .thumb { height: 56px; }
-  .card-body { gap: 9px; }
-  .card .brief { -webkit-line-clamp: 2; font-size: 13px; }
-  .card h4 { display: none; }
-  .features { gap: 3px; font-size: 12.5px; }
 }
 
 /* "Contact Me" pops up from behind the contact card's top-left edge once the card
