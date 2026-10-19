@@ -92,6 +92,8 @@ strong { color: var(--accent-2); font-weight: 600; }
 .px-btn:hover { transform: translateY(-2px); }
 .px-btn:active { transform: translateY(2px); }
 .px-btn.big { font-size: clamp(9px, 2.2vw, 13px); padding: 16px 20px; word-break: break-all; }
+.copy-email.copied { color: var(--accent-2); }
+.copy-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }  /* screen readers only */
 
 .tags { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
 .tags li {

@@ -431,3 +431,46 @@ window.addEventListener("resize", () => { layout(); onScroll(); });
 layout();
 onScroll();
 document.fonts.ready.then(layout);  // panel heights change once the web fonts load
+
+// Clicking the email copies it instead of opening a mail app. The mailto link stays as the
+// fallback if the clipboard is unavailable.
+const emailBtn = document.querySelector(".copy-email");
+const copyStatus = document.querySelector(".copy-status");
+let copyTimer = 0;
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // older browsers / non-secure pages
+    const ta = Object.assign(document.createElement("textarea"), { value: text });
+    ta.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch { /* ignore */ }
+    ta.remove();
+    return ok;
+  }
+}
+emailBtn.addEventListener("click", async (e) => {
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;  // let modified clicks open mail
+  e.preventDefault();
+  const email = emailBtn.href.replace(/^mailto:/, "");
+  if (!(await copyText(email))) { window.location.href = emailBtn.href; return; }
+  if (!emailBtn.classList.contains("copied")) {  // hold the button's size while the label changes
+    const r = emailBtn.getBoundingClientRect();
+    emailBtn.style.minWidth = `${r.width}px`;
+    emailBtn.style.minHeight = `${r.height}px`;
+  }
+  emailBtn.textContent = "Copied to clipboard!";
+  emailBtn.classList.add("copied");
+  copyStatus.textContent = "Email copied to clipboard";
+  clearTimeout(copyTimer);
+  copyTimer = setTimeout(() => {
+    emailBtn.textContent = email;
+    emailBtn.classList.remove("copied");
+    emailBtn.style.minWidth = emailBtn.style.minHeight = "";
+    copyStatus.textContent = "";
+  }, 1800);
+});
