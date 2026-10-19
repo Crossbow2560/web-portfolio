@@ -478,8 +478,8 @@ html.menu-open { overflow: hidden; }   /* the page doesn't scroll behind the ope
 .job h3 { font-family: var(--pixel-font); font-size: clamp(13px, 1.3vw, 19px); line-height: 1.4; }
 .job-when { color: var(--muted); font-size: clamp(13px, 1vw, 16px); white-space: nowrap; }
 .job-org { color: var(--accent-2); font-size: clamp(14px, 1.1vw, 17px); margin: 8px 0 12px; }
-.job .features { font-size: clamp(14px, 1.15vw, 17.5px); gap: 8px; }
-.job-project { color: var(--text); font-weight: 600; font-size: clamp(13.5px, 1.05vw, 16px); margin: 14px 0 8px; }
+.job .features { font-size: clamp(14px, 1.15vw, 17.5px); gap: 8px; color: var(--muted); }
+.job-project { color: var(--text); font-weight: 700; font-size: clamp(15px, 1.25vw, 19px); margin: 14px 0 8px; }
 .job-org + .job-project { margin-top: 0; }
 /* short screens where even .tight doesn't fit (script.js): the contents scroll inside the box */
 .jobs.scrolls { overflow: hidden; }
@@ -511,12 +511,12 @@ html.menu-open { overflow: hidden; }   /* the page doesn't scroll behind the ope
 .jobs.snug .job-when { font-size: 13px; }
 .jobs.snug .job-org { font-size: 14px; margin: 6px 0 10px; }
 .jobs.snug .features { font-size: clamp(13px, 1vw, 14.5px); gap: 6px; }
-.jobs.snug .job-project { font-size: 13.5px; margin-top: 10px; }
+.jobs.snug .job-project { font-size: 15px; margin-top: 10px; }
 .jobs.tight { row-gap: 12px; padding: 18px 22px; }
 .jobs.tight .job + .job { padding-top: 12px; }
 .jobs.tight .job-org { margin: 2px 0 6px; font-size: 13px; }
 .jobs.tight .features { font-size: 12.5px; line-height: 1.45; gap: 4px; }
-.jobs.tight .job-project { font-size: 12.5px; margin: 8px 0 4px; }
+.jobs.tight .job-project { font-size: 14px; margin: 8px 0 4px; }
 .jobs.tight .job-org + .job-project { margin-top: 0; }
 @media (min-width: 1000px) {
   .jobs.snug .job-main + .job,
