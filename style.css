@@ -698,6 +698,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 .socials a { font-family: var(--pixel-font); font-size: 11px; color: var(--muted); text-decoration: none; }
 .socials a:hover { color: var(--text); }
 .contact-card footer { color: var(--muted); font-size: 12px; }
+.contact-card footer time { white-space: nowrap; }
 
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {

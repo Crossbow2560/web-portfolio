@@ -431,5 +431,3 @@ window.addEventListener("resize", () => { layout(); onScroll(); });
 layout();
 onScroll();
 document.fonts.ready.then(layout);  // panel heights change once the web fonts load
-
-document.getElementById("year").textContent = new Date().getFullYear();
