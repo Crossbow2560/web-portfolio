@@ -445,7 +445,20 @@ const trackPinned = () => {
   const r = projects.getBoundingClientRect();
   return r.top <= 1 && r.bottom >= window.innerHeight - 1;
 };
-const scrollPageBy = (dy) => window.scrollBy({ top: dy, behavior: "instant" });
+// Sideways moves stay inside the pinned stretch, so a swipe past either end of the track
+// stops there instead of carrying the page out of the section (where sideways input no
+// longer applies). They also skip the short holds before the cards start moving and
+// after they stop, so a sideways swipe always moves the cards straight away.
+const scrollPageBy = (dy) => {
+  const lo = projects.offsetTop;
+  const hi = lo + projects.offsetHeight - window.innerHeight;
+  const start = lo + holdStart, end = start + travel;   // where the track moves
+  const from = dy > 0 ? Math.max(window.scrollY, start) : Math.min(window.scrollY, end);
+  let y = clamp(from + dy, lo, hi);
+  if (dy < 0 && y < start) y = lo;    // back at the first card: rest on the section's stop
+  if (dy > 0 && y > end) y = hi;      // at the contact card: rest at the section's end
+  window.scrollTo({ top: y, behavior: "instant" });
+};
 
 window.addEventListener("wheel", (e) => {
   if (e.ctrlKey) return;                                  // pinch-zoom on trackpads
