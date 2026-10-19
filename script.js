@@ -83,11 +83,12 @@ function layout() {
 // (down to two) before anything else, so the description stays whole. If a card
 // still doesn't fit, every project card switches to the tighter .tight style
 // together (so a row never mixes styles) and the highlights are fitted again; only
-// a card that still overflows then gets its description capped (.clamp).
+// a card that still overflows then gets its description capped (.clamp, then .clamp1)
+// and, on the very smallest screens, may drop to a single highlight.
 // Phones show everything (cards grow to fit there).
 function fitCards() {
   const cards = [...track.querySelectorAll(".card.project")];
-  const fit = (card) => {
+  const fit = (card, min = 2) => {
     const body = card.querySelector(".card-body");
     const btn = card.querySelector(".view");
     const items = [...card.querySelectorAll(".features li")];
@@ -96,15 +97,46 @@ function fitCards() {
     const overflows = () =>
       btn.getBoundingClientRect().bottom >
       body.getBoundingClientRect().bottom - parseFloat(getComputedStyle(body).paddingBottom) + 0.5;
-    for (let n = items.length; overflows() && n > 2; n--) items[n - 1].classList.add("is-cut");
+    for (let n = items.length; overflows() && n > min; n--) items[n - 1].classList.add("is-cut");
     return !overflows();
   };
-  cards.forEach((card) => card.classList.remove("tight", "clamp"));
+  fitMinis();
+  cards.forEach((card) => card.classList.remove("tight", "clamp", "clamp1"));
   if (vertical) { cards.forEach((card) => card.querySelectorAll(".is-cut").forEach((li) => li.classList.remove("is-cut"))); return; }
   if (!cards.map(fit).every(Boolean)) {
     cards.forEach((card) => card.classList.add("tight"));
-    // last resort, per card: cap the description at two lines
-    cards.forEach((card) => { if (!fit(card)) { card.classList.add("clamp"); fit(card); } });
+    // last resorts, per card: cap the description at two lines, then one line, then
+    // allow a single highlight (only the smallest laptop screens get this far)
+    cards.forEach((card) => {
+      if (fit(card)) return;
+      card.classList.add("clamp");
+      if (fit(card)) return;
+      card.classList.add("clamp1");
+      if (!fit(card)) fit(card, 1);
+    });
+  }
+}
+
+// The "More Projects" drawer's small cards get the same treatment on laptops: if one
+// doesn't fit, its description is shortened (3 → 2 → 1 lines), then tags are dropped
+// from the end (down to two). Phones show everything.
+function fitMinis() {
+  for (const card of document.querySelectorAll("#more-panel .mini-card:not(.more-cta)")) {
+    const body = card.querySelector(".mini-body");
+    const btn = card.querySelector(".mini-view");
+    const tags = [...card.querySelectorAll(".tags li")];
+    card.classList.remove("d3", "d2", "d1");
+    tags.forEach((li) => li.classList.remove("is-cut"));
+    if (vertical) continue;
+    const overflows = () =>
+      btn.getBoundingClientRect().bottom >
+      body.getBoundingClientRect().bottom - parseFloat(getComputedStyle(body).paddingBottom) + 0.5;
+    for (const lines of ["d3", "d2", "d1"]) {
+      if (!overflows()) break;
+      card.classList.remove("d3", "d2", "d1");
+      card.classList.add(lines);
+    }
+    for (let n = tags.length; overflows() && n > 2; n--) tags[n - 1].classList.add("is-cut");
   }
 }
 
