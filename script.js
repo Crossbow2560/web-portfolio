@@ -241,7 +241,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let navRun = 0;  // a newer click cancels an older one mid-fade
 
-document.querySelectorAll(".topbar nav a").forEach((a) =>
+document.querySelectorAll(".topbar a").forEach((a) =>
   a.addEventListener("click", async (e) => {
     const hash = a.getAttribute("href");
     if (navTarget(hash) === null) return;
@@ -259,7 +259,7 @@ document.querySelectorAll(".topbar nav a").forEach((a) =>
     onScroll();
     void root.offsetHeight;  // apply the settled state before animations come back
     root.classList.remove("is-jumping");
-    history.replaceState(null, "", hash);
+    history.replaceState(null, "", hash === "#top" ? location.pathname + location.search : hash);
     root.classList.remove("is-faded");
   })
 );
