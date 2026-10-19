@@ -127,7 +127,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 .topbar nav a:hover { color: var(--text); }
 
 /* ---------- frames 1 & 2: intro ---------- */
-.intro { position: relative; height: 380vh; }
+.intro { position: relative; height: 403.6vh; }
 
 /* nav clicks: the page content (not the nav or the tarmac) fades out, the page jumps,
    then it fades back in. .is-jumping switches off the sections' own animations for
@@ -143,8 +143,8 @@ strong { color: var(--accent-2); font-weight: 600; }
 .is-jumping .projects-head,
 .is-jumping .contact-head h2 { transition: none !important; }
 /* nav targets, inside the about and skills stretches (timeline in script.js) */
-.anchor { position: absolute; top: 70vh; }
-.anchor-skills { top: 180vh; }
+.anchor { position: absolute; top: 90vh; }
+.anchor-skills { top: 210vh; }
 
 .stage {
   position: sticky;

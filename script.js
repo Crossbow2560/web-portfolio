@@ -169,13 +169,14 @@ function onScroll() {
   }
 
   // Frames 1 → 2 → 3: hero, about, skills, then fade the stage out completely.
-  // Timeline in vh scrolled through the intro (380vh tall, 280vh scrollable):
-  //   0–36 hero · 36–140 about · 140–246.4 skills · 246.4–270.4 fade · 270.4–280 tail
+  // Timeline in vh scrolled through the intro (403.6vh tall, 303.6vh scrollable):
+  //   0–30 hero · 30–150 about · 150–270 skills · 270–294 fade · 294–303.6 tail
+  // Scroll stops (below) sit at 0, 90 (about), 210 (skills) and the projects' start.
   // The fade ends 9.6vh before the intro does, which the projects crossfade relies on.
   const sv = (-intro.getBoundingClientRect().top / vh) * 100;
-  stage.classList.toggle("is-about", sv > 36);
-  stage.classList.toggle("is-skills", sv > 140);
-  const shrink = clamp((sv - 246.4) / 24, 0, 1);
+  stage.classList.toggle("is-about", sv > 30);
+  stage.classList.toggle("is-skills", sv > 150);
+  const shrink = clamp((sv - 270) / 24, 0, 1);
   stage.style.setProperty("--shrink", shrink.toFixed(3));
   stage.style.visibility = shrink >= 1 ? "hidden" : "";
 
@@ -262,6 +263,106 @@ document.querySelectorAll(".topbar nav a").forEach((a) =>
     root.classList.remove("is-faded");
   })
 );
+
+// Scroll stops (laptops/tablets): hero → about → skills → start of the projects. One
+// scroll gesture moves exactly one stop, up or down, with a short glide, so a hard swipe
+// can't skip a section. A "gesture" is a burst of wheel events (trackpad momentum
+// included) with no gap over 200 ms. Inside the projects, scrolling is free as before;
+// scrolling up past their start stops there first. Phones scroll normally.
+const STOP_GAP_MS = 200;
+let stepping = false;
+let lastWheelAt = 0;
+let stepAnim = 0;
+
+function scrollStops() {
+  const at = (el) => el.getBoundingClientRect().top + window.scrollY;
+  return [0, at(document.getElementById("about")), at(document.getElementById("skills")), projects.offsetTop];
+}
+const projectsStop = () => projects.offsetTop;
+
+function glideTo(target) {
+  cancelAnimationFrame(stepAnim);
+  const from = window.scrollY, dist = target - from;
+  if (reduceMotion.matches || Math.abs(dist) < 1) {
+    window.scrollTo({ top: target, behavior: "instant" });
+    stepping = false;
+    return;
+  }
+  stepping = true;
+  const t0 = performance.now(), dur = 650;
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const frame = (now) => {
+    const t = Math.min(1, (now - t0) / dur);
+    window.scrollTo({ top: from + dist * ease(t), behavior: "instant" });
+    if (t < 1) stepAnim = requestAnimationFrame(frame);
+    else stepping = false;
+  };
+  stepAnim = requestAnimationFrame(frame);
+}
+
+// next stop in a direction from y (or null when y is past the last one going down)
+function stopFrom(y, dir) {
+  const stops = scrollStops();
+  return dir > 0 ? stops.find((s) => s > y + 4) ?? null : [...stops].reverse().find((s) => s < y - 4) ?? null;
+}
+const atAStop = (y) => scrollStops().some((s) => Math.abs(s - y) <= 4);
+// true when a move of `delta` from y should be handled by the stops
+function inStopZone(y, delta) {
+  if (vertical) return false;
+  const P = projectsStop();
+  if (delta > 0) return y < P - 2;           // going down: anywhere above the projects
+  return y <= P + 2 || y + delta < P - 2;    // going up: from the projects' start, or crossing it
+}
+function stepScroll(dir) {
+  const y = window.scrollY, P = projectsStop();
+  // a fast upward fling from inside the projects stops at their start first
+  const target = dir < 0 && y > P + 2 ? P : stopFrom(y, dir);
+  if (target !== null) glideTo(target);
+}
+
+window.addEventListener("wheel", (e) => {
+  if (e.ctrlKey || vertical) return;
+  const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1;
+  const dy = e.deltaY * unit;
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey || !dy) return;   // sideways: see below
+  const now = performance.now();
+  const newGesture = now - lastWheelAt > STOP_GAP_MS;
+  lastWheelAt = now;
+  if (stepping) { e.preventDefault(); return; }
+  if (!inStopZone(window.scrollY, dy)) return;
+  e.preventDefault();
+  if (atAStop(window.scrollY) && !newGesture) return;   // rest of a swipe that already moved
+  stepScroll(Math.sign(dy));
+}, { passive: false });
+
+window.addEventListener("keydown", (e) => {
+  if (vertical || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+  if (e.key === " " && e.target.closest && e.target.closest("button, a, [role=button]")) return;  // Space activates it
+  const dir = { ArrowDown: 1, PageDown: 1, ArrowUp: -1, PageUp: -1 }[e.key] ?? (e.key === " " ? (e.shiftKey ? -1 : 1) : 0);
+  if (!dir) return;
+  if (stepping) { e.preventDefault(); return; }
+  const y = window.scrollY;
+  if (!inStopZone(y, dir * window.innerHeight * 0.5)) return;
+  e.preventDefault();
+  stepScroll(dir);
+});
+
+// touch: in the stop zone a vertical swipe moves one stop instead of scrolling freely
+let swipe = null;
+document.addEventListener("touchstart", (e) => {
+  swipe = !vertical && e.touches.length === 1 ? { y0: e.touches[0].clientY, x0: e.touches[0].clientX, used: false } : null;
+}, { passive: true });
+document.addEventListener("touchmove", (e) => {
+  if (!swipe) return;
+  const t = e.touches[0], dy = swipe.y0 - t.clientY, dx = swipe.x0 - t.clientX;
+  if (Math.abs(dx) > Math.abs(dy)) return;                  // sideways drags are handled elsewhere
+  if (stepping) { e.preventDefault(); return; }
+  if (!inStopZone(window.scrollY, dy || 1)) return;
+  e.preventDefault();
+  if (!swipe.used && Math.abs(dy) > 40) { swipe.used = true; stepScroll(Math.sign(dy)); }
+}, { passive: false });
+document.addEventListener("touchend", () => { swipe = null; });
 
 // Sideways input while the projects track is pinned: trackpad side-swipes, Shift+wheel
 // and horizontal finger drags are turned into the vertical scroll that drives the track,
