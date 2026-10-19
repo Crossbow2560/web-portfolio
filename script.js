@@ -5,6 +5,9 @@ const pin = projects.querySelector(".projects-pin");
 const track = document.getElementById("track");
 const head = projects.querySelector(".projects-head");
 const contact = document.getElementById("contact");
+const experience = document.getElementById("experience");
+const expPin = experience.querySelector(".experience-pin");
+const jobs = experience.querySelector(".jobs");
 
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
@@ -15,6 +18,7 @@ let lastStep = 1;   // px of the final slide that brings the contact card in
 let vertical = false; // phones: plain vertical list instead of the horizontal track
 let trackX = 0;         // current sideways position of the track
 let moreOpen = false;   // "More Projects" drawer open (it lengthens the track)
+let expExtra = 0;       // px of experience list that don't fit the screen (scrolled inside the box)
 
 function layout() {
   const vw = pin.clientWidth;          // excludes the scrollbar
@@ -40,6 +44,33 @@ function layout() {
     for (const el of heroEls) el.style.removeProperty("--stick-top");
     stage.style.removeProperty("--hero-fade");
     stage.classList.remove("hero-gone");
+  }
+
+  // Experience list: tighter type when it doesn't fit the screen (laptops only)
+  jobs.classList.remove("snug", "tight", "scrolls");
+  jobs.style.removeProperty("height");
+  experience.style.removeProperty("--exp-extra");
+  expExtra = 0;
+  if (!vertical) {
+    const cs = getComputedStyle(expPin);
+    const room = expPin.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    // layout boxes only: before it slides in, the list is offset by a transform
+    const expHead = experience.querySelector(".experience-head");
+    const need = () => expHead.offsetHeight + parseFloat(getComputedStyle(expHead).marginBottom) + jobs.offsetHeight;
+    for (const size of ["snug", "tight"]) {
+      if (need() <= room) break;
+      jobs.classList.remove("snug", "tight");
+      jobs.classList.add(size);
+    }
+    // still too tall (short tablet screens): the box keeps the height that fits and its
+    // contents scroll up inside it, over extra scroll added to the section (see onScroll)
+    const over = Math.ceil(need() - room);
+    if (over > 0) {
+      expExtra = over;
+      jobs.style.height = `${jobs.offsetHeight - over}px`;
+      jobs.classList.add("scrolls");
+      experience.style.setProperty("--exp-extra", `${over}px`);
+    }
   }
 
   if (vertical) {
@@ -160,7 +191,10 @@ function onScroll() {
     const fade = clamp((aboutTop - vh * 0.4) / (vh * 0.6), 0, 1);
     stage.style.setProperty("--hero-fade", fade.toFixed(3));
     stage.classList.toggle("hero-gone", fade < 0.05);
-    for (const el of [...stage.children, head, ...track.children])
+    experience.classList.remove("in");
+    expPin.style.removeProperty("--exp-out");
+    expPin.style.visibility = "";
+    for (const el of [...stage.children, ...expPin.querySelector(".experience-inner").children, head, ...track.children])
       el.classList.toggle("in", el.getBoundingClientRect().top < vh * 0.92);
     // dead end: the contact card is fully on screen
     const c = contact.getBoundingClientRect();
@@ -180,7 +214,19 @@ function onScroll() {
   stage.style.setProperty("--shrink", shrink.toFixed(3));
   stage.style.visibility = shrink >= 1 ? "hidden" : "";
 
-  // Frame 3: cards rise in, then vertical scroll drives them sideways.
+  // Frame 3: experience rises in (in the middle of the stage fade), holds, then shrinks
+  // and fades the same way between 30 and 54vh past its top. The projects (pulled up
+  // 60vh over its 163.6vh) rise in at 43.6vh, mid-fade.
+  // On short screens whose list doesn't fit, the list first scrolls inside its box
+  // (expExtra px), and everything after starts that much later.
+  const et = experience.getBoundingClientRect().top;
+  experience.classList.toggle("in", et < vh * 0.6);
+  jobs.style.setProperty("--exp-shift", clamp(-et, 0, expExtra).toFixed(1));
+  const out = clamp(((-et - expExtra) / vh * 100 - 30) / 24, 0, 1);
+  expPin.style.setProperty("--exp-out", out.toFixed(3));
+  expPin.style.visibility = out >= 1 ? "hidden" : "";
+
+  // Frame 4: cards rise in, then vertical scroll drives them sideways.
   const top = projects.getBoundingClientRect().top;
   projects.classList.toggle("in", top < vh * 0.6);  // undone when scrolling back up
   let x = clamp(-top - holdStart, 0, travel);
@@ -241,11 +287,35 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let navRun = 0;  // a newer click cancels an older one mid-fade
 
+// Phones: the menu button opens a sidebar with the nav links. It closes on the button
+// (now an X), a tap outside, Escape, picking a link, or the window growing past phone size.
+const menuBtn = document.querySelector(".menu-btn");
+const sideMenu = document.getElementById("side-menu");
+
+function setMenu(open, refocus = true) {
+  const root = document.documentElement;
+  if (root.classList.contains("menu-open") === open) return;
+  root.classList.toggle("menu-open", open);
+  menuBtn.setAttribute("aria-expanded", String(open));
+  menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  if (open) sideMenu.querySelector("a").focus({ preventScroll: true });
+  else if (refocus && sideMenu.contains(document.activeElement)) menuBtn.focus({ preventScroll: true });
+}
+menuBtn.addEventListener("click", () => setMenu(!document.documentElement.classList.contains("menu-open")));
+document.querySelector(".menu-backdrop").addEventListener("click", () => setMenu(false));
+window.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
+window.addEventListener("resize", () => { if (window.innerWidth > 760) setMenu(false, false); });
+// tabbing out of the sidebar closes it
+document.addEventListener("focusin", (e) => {
+  if (!sideMenu.contains(e.target) && e.target !== menuBtn) setMenu(false, false);
+});
+
 document.querySelectorAll(".topbar a").forEach((a) =>
   a.addEventListener("click", async (e) => {
     const hash = a.getAttribute("href");
     if (navTarget(hash) === null) return;
     e.preventDefault();
+    setMenu(false, false);
     const run = ++navRun;
     const root = document.documentElement;
     if (!reduceMotion.matches) {
@@ -264,7 +334,7 @@ document.querySelectorAll(".topbar a").forEach((a) =>
   })
 );
 
-// Scroll stops (laptops/tablets): hero → about → skills → start of the projects. One
+// Scroll stops (laptops/tablets): hero → about → skills → experience → start of the projects. One
 // scroll gesture moves exactly one stop, up or down, with a short glide, so a hard swipe
 // can't skip a section. A "gesture" is a burst of wheel events (trackpad momentum
 // included) with no gap over 200 ms. Inside the projects, scrolling is free as before;
@@ -276,7 +346,9 @@ let stepAnim = 0;
 
 function scrollStops() {
   const at = (el) => el.getBoundingClientRect().top + window.scrollY;
-  return [0, at(document.getElementById("about")), at(document.getElementById("skills")), projects.offsetTop];
+  const stops = [0, at(document.getElementById("about")), at(document.getElementById("skills")), experience.offsetTop];
+  if (expExtra > 4) stops.push(experience.offsetTop + expExtra);   // the end of a list that scrolls inside its box
+  return [...stops, projects.offsetTop];
 }
 const projectsStop = () => projects.offsetTop;
 

@@ -118,10 +118,23 @@
 <body>
   <header class="topbar">
     <a class="brand" href="#top" aria-label="Back to top"><img src="assets/logo-128.png" alt="" width="128" height="128" /></a>
-    <nav class="px-box">
+    <nav class="main-nav px-box">
       <a href="#projects">Projects</a>
       <a href="#about">About</a>
       <a href="#skills">Skills</a>
+      <a href="#experience">Experience</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <!-- phones: a menu button and a sidebar instead of the nav bar -->
+    <button class="menu-btn px-box" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="side-menu">
+      <span class="menu-icon" aria-hidden="true"></span>
+    </button>
+    <div class="menu-backdrop" aria-hidden="true"></div>
+    <nav class="side-menu px-box" id="side-menu" aria-label="Menu">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
@@ -188,7 +201,55 @@
     </div>
   </section>
 
-  <!-- Frame 3: projects rise from the bottom, then slide sideways on vertical scroll.
+  <!-- Frame 3: experience (from the resume) slides up from the bottom as the skills
+       frame shrinks and fades, then shrinks and fades itself as the projects arrive -->
+  <section class="experience" id="experience" aria-labelledby="experience-title">
+    <div class="experience-pin">
+      <div class="experience-inner">
+        <h2 id="experience-title" class="experience-head">Experience</h2>
+        <ol class="jobs px-box">
+          <li class="job job-main">
+            <div class="job-top">
+              <h3>Research Intern</h3>
+              <span class="job-when">Jun – Jul 2026</span>
+            </div>
+            <p class="job-org">PES Innovation Lab (Akamai-funded)</p>
+            <p class="job-project">Grimoire – LLM-based Knowledge Wiki</p>
+            <ul class="features">
+              <li>Built an LLM-based knowledge wiki (Grimoire) that converts scattered Jira issues, Confluence docs, PDFs, and markdown files into a persistent, structured, interlinked knowledge base, with automated Atlassian ingestion and tag-based indexing.</li>
+              <li>Implemented rolling summarization and multimodal image interpretation for large documents, and built an interactive chatbot that answers relational queries by cross-referencing wiki files – version-controlled with Git throughout.</li>
+            </ul>
+            <p class="job-project">AgentSecureBench – Agent Security Testing Framework</p>
+            <ul class="features">
+              <li>Built a Python test-automation framework for evaluating LLM-backed agents against memory poisoning: a hot-swappable LLM adapter layer, risk-tiered tool registry, full observability, and an external memory store.</li>
+              <li>Designed and ran a 200-case memory-poisoning benchmark across 5 local LLMs (7%–93% per-domain attack success rates), plus a prompt-injection test harness sweeping authority-override, role-spoofing, and jailbreak variants.</li>
+            </ul>
+          </li>
+          <li class="job">
+            <div class="job-top">
+              <h3>Club Head</h3>
+            </div>
+            <p class="job-org">The Alcoding Club</p>
+            <ul class="features">
+              <li>Hosted club events: CTFs, hackathons, and competitive programming events.</li>
+              <li>Attended multiple hackathons, CTFs, and competitive programming challenges.</li>
+            </ul>
+          </li>
+          <li class="job">
+            <div class="job-top">
+              <h3>IEEE RAS Member</h3>
+            </div>
+            <p class="job-org">Remote Robotics Lab – Center for Robotics, Automation and Intelligent Systems (cRAIS)</p>
+            <ul class="features">
+              <li>Contributed to a remote robotics initiative at cRAIS by building a line-follower bot and a custom web dashboard, enabling users to write, upload, and run code on the physical bot without direct lab access.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame 4: projects rise from the bottom, then slide sideways on vertical scroll.
        The last card is the contact card and spans three card widths. -->
   <section class="projects" id="projects" aria-labelledby="projects-title">
     <div class="projects-pin">

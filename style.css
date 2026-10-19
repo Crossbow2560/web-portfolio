@@ -113,20 +113,20 @@ strong { color: var(--accent-2); font-weight: 600; }
   padding: 20px 16px;
   pointer-events: none;
 }
-.topbar nav {
+.main-nav {
   pointer-events: auto;
   display: flex;
-  gap: clamp(20px, 6vw, 72px);
+  gap: clamp(20px, calc(10vw - 56px), 72px);   /* tighter on small screens, clear of the logo */
   padding: 14px clamp(20px, 4vw, 40px);
 }
-.topbar nav a {
+.main-nav a {
   font-family: var(--pixel-font);
   font-size: clamp(12px, 1.1vw, 15px);
   text-decoration: none;
   color: var(--muted);
   transition: color 0.2s;
 }
-.topbar nav a:hover { color: var(--text); }
+.main-nav a:hover { color: var(--text); }
 /* logo, top left: a bare square as tall as the nav box */
 .brand {
   pointer-events: auto;
@@ -142,6 +142,81 @@ strong { color: var(--accent-2); font-weight: 600; }
 .brand img { width: 100%; height: 100%; display: block; }
 @media (hover: hover) { .brand:hover { translate: 0 -2px; } }
 
+/* phones: menu button (top right) and a sidebar that slides in from the right.
+   Hidden on larger screens; the phone media query below switches them on. */
+.menu-btn,
+.menu-backdrop,
+.side-menu { display: none; }
+.menu-btn {
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;               /* stays above the open sidebar, as its close button */
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  color: var(--text);
+  cursor: pointer;
+}
+/* three pixel bars that become a pixel X when the menu is open */
+.menu-icon,
+.menu-icon::before,
+.menu-icon::after {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 20px;
+  height: 4px;
+  margin: -2px 0 0 -10px;
+  background: currentColor;
+  transition: transform 0.25s var(--ease), opacity 0.2s;
+}
+.menu-icon::before,
+.menu-icon::after { content: ""; left: 0; top: 0; margin: 0; }
+.menu-icon::before { transform: translateY(-7px); }
+.menu-icon::after { transform: translateY(7px); }
+.menu-open .menu-icon { background: transparent; }
+.menu-open .menu-icon::before { transform: rotate(45deg); }
+.menu-open .menu-icon::after { transform: rotate(-45deg); }
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(78vw, 300px);
+  flex-direction: column;
+  gap: 30px;
+  padding: 104px 32px 32px;
+  transform: translateX(calc(100% + 16px));   /* clear of its own pixel shadow */
+  visibility: hidden;                         /* out of the tab order while closed */
+  transition: transform 0.35s var(--ease), visibility 0s 0.35s;
+}
+.side-menu a {
+  font-family: var(--pixel-font);
+  font-size: 14px;
+  line-height: 1.5;
+  text-decoration: none;
+  color: var(--muted);
+}
+.side-menu a:hover,
+.side-menu a:focus-visible { color: var(--text); }
+.menu-open .menu-backdrop { opacity: 1; pointer-events: auto; }
+.menu-open .side-menu {
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+  transition: transform 0.35s var(--ease), visibility 0s;
+}
+html.menu-open { overflow: hidden; }   /* the page doesn't scroll behind the open menu */
+
 /* ---------- frames 1 & 2: intro ---------- */
 .intro { position: relative; height: 403.6vh; }
 
@@ -149,14 +224,18 @@ strong { color: var(--accent-2); font-weight: 600; }
    then it fades back in. .is-jumping switches off the sections' own animations for
    the jump so the destination appears already settled (see script.js). */
 .intro,
+.experience,
 .projects { transition: opacity 0.3s ease; }
 .is-faded .intro,
+.is-faded .experience,
 .is-faded .projects { opacity: 0; }
 .is-jumping .stage,
 .is-jumping .stage::before,
 .is-jumping .stage > *,
 .is-jumping .card,
 .is-jumping .projects-head,
+.is-jumping .experience-head,
+.is-jumping .jobs,
 .is-jumping .contact-head h2 { transition: none !important; }
 /* nav targets, inside the about and skills stretches (timeline in script.js) */
 .anchor { position: absolute; top: 90vh; }
@@ -347,7 +426,104 @@ strong { color: var(--accent-2); font-weight: 600; }
   pointer-events: auto;
 }
 
-/* ---------- frame 3: projects (horizontal scroll) + contact card ---------- */
+/* ---------- frame 3: experience ---------- */
+/* pulled up so it rises in while the skills frame shrinks and fades; it then pins for
+   a moment and shrinks and fades the same way (--exp-out, script.js) as the projects
+   rise in over it. Height and timings are matched in script.js. */
+.experience { position: relative; margin-top: -60vh; height: calc(163.6vh + var(--exp-extra, 0px)); }
+.experience-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 104px var(--pad) 40px;
+  pointer-events: none;   /* overlaps the skills fade-out; only the content takes clicks */
+  transform: scale(calc(1 - var(--exp-out, 0) * 0.18));
+  opacity: calc(1 - var(--exp-out, 0));
+  transform-origin: 50% 30%;
+}
+.experience-inner {
+  width: min(100%, 1320px);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.experience-head {
+  font-family: var(--pixel-font);
+  font-size: clamp(18px, 2.2vw, 30px);
+  line-height: 1.4;
+  margin-bottom: clamp(12px, 2.2vh, 24px);
+}
+.experience-head,
+.jobs {
+  opacity: 0;
+  transform: translateY(120px);
+  transition: transform 0.8s var(--ease), opacity 0.8s var(--ease);
+}
+.jobs { transition-delay: 0.08s; pointer-events: auto; }
+.experience.in .experience-head,
+.experience.in .jobs { opacity: 1; transform: none; }
+
+.jobs {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 3.2vh, 36px);
+  padding: clamp(24px, 3.2vw, 56px);
+}
+.job + .job { border-top: 2px solid var(--soft-line); padding-top: clamp(16px, 3.2vh, 36px); }
+.job-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.job h3 { font-family: var(--pixel-font); font-size: clamp(13px, 1.3vw, 19px); line-height: 1.4; }
+.job-when { color: var(--muted); font-size: clamp(13px, 1vw, 16px); white-space: nowrap; }
+.job-org { color: var(--accent-2); font-size: clamp(14px, 1.1vw, 17px); margin: 8px 0 12px; }
+.job .features { font-size: clamp(14px, 1.15vw, 17.5px); gap: 8px; }
+.job-project { color: var(--text); font-weight: 600; font-size: clamp(13.5px, 1.05vw, 16px); margin: 14px 0 8px; }
+.job-org + .job-project { margin-top: 0; }
+/* short screens where even .tight doesn't fit (script.js): the contents scroll inside the box */
+.jobs.scrolls { overflow: hidden; }
+.jobs.scrolls > .job { flex-shrink: 0; translate: 0 calc(var(--exp-shift, 0) * -1px); }
+/* wide screens: the internship on the left, the other two roles stacked on the right */
+@media (min-width: 1000px) {
+  .jobs {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(28px, 3.2vw, 56px);
+  }
+  /* the divider sits halfway across the column gap: the box reaches half the gap into
+     it, and the same amount of padding keeps the text inside its own column */
+  .job-main {
+    grid-row: 1 / span 2;
+    padding-right: calc(clamp(28px, 3.2vw, 56px) / 2);
+    margin-right: calc(clamp(28px, 3.2vw, 56px) / -2);
+    border-right: 2px solid var(--soft-line);
+  }
+  .job-main + .job { border-top: 0; padding-top: 0; }
+}
+
+/* shorter laptop screens (set by script.js when the list doesn't fit): first the
+   smaller .snug sizes, then the tighter .tight type */
+.jobs.snug { row-gap: clamp(14px, 2.6vh, 28px); padding: clamp(20px, 2.6vw, 40px); }
+.jobs.snug .job + .job { padding-top: clamp(14px, 2.6vh, 28px); }
+.jobs.snug .job h3 { font-size: clamp(12px, 1.1vw, 15px); }
+.jobs.snug .job-when { font-size: 13px; }
+.jobs.snug .job-org { font-size: 14px; margin: 6px 0 10px; }
+.jobs.snug .features { font-size: clamp(13px, 1vw, 14.5px); gap: 6px; }
+.jobs.snug .job-project { font-size: 13.5px; margin-top: 10px; }
+.jobs.tight { row-gap: 12px; padding: 18px 22px; }
+.jobs.tight .job + .job { padding-top: 12px; }
+.jobs.tight .job-org { margin: 2px 0 6px; font-size: 13px; }
+.jobs.tight .features { font-size: 12.5px; line-height: 1.45; gap: 4px; }
+.jobs.tight .job-project { font-size: 12.5px; margin: 8px 0 4px; }
+.jobs.tight .job-org + .job-project { margin-top: 0; }
+@media (min-width: 1000px) {
+  .jobs.snug .job-main + .job,
+  .jobs.tight .job-main + .job { padding-top: 0; }   /* top of the right column */
+}
+
+/* ---------- frame 4: projects (horizontal scroll) + contact card ---------- */
 /* .projects height and the --card-w / --contact-w / --track-x vars are set by script.js */
 /* pulled up so the cards rise in while the about panel fades out (no blank scroll) */
 .projects { position: relative; margin-top: -60vh; }
@@ -719,10 +895,13 @@ strong { color: var(--accent-2); font-weight: 600; }
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {
   /* logo and nav share one row: the nav takes the rest and spreads its links */
-  .topbar { justify-content: flex-start; gap: 6px; padding: 20px 8px; }
+  /* logo on the left, menu button on the right; the nav bar becomes the sidebar */
+  .topbar { justify-content: flex-start; padding: 20px 16px; }
   .brand { position: static; flex: none; width: 44px; height: 44px; }
-  .topbar nav { flex: 1; height: 44px; align-items: center; justify-content: space-between; gap: 6px; padding: 0 clamp(10px, 3vw, 16px); }
-  .topbar nav a { font-size: clamp(8px, 2.3vw, 10px); }   /* logo + all four links fit on one line at 320px */
+  .main-nav { display: none; }
+  .menu-btn { display: block; }
+  .menu-backdrop { display: block; }
+  .side-menu { display: flex; }
 
   /* intro: a plain vertical flow on phones (no pinned, scroll-driven stage).
      The stage box is dissolved so its children stack inside .intro:
@@ -800,6 +979,15 @@ strong { color: var(--accent-2); font-weight: 600; }
       8px 8px, 12px 8px, 12px 4px, 16px 4px, 16px 0
     );
   }
+
+  /* experience: a plain block on phones; the heading and list rise in as they arrive */
+  .experience { margin-top: 0; height: auto; }
+  .experience-pin { position: static; height: auto; display: block; padding: 96px 16px 0; transform: none; opacity: 1; }
+  .experience-head { font-size: 18px; margin-bottom: 20px; }
+  .experience-head.in,
+  .jobs.in { opacity: 1; transform: none; }
+  .jobs { padding: 22px; gap: 20px; }
+  .job + .job { padding-top: 20px; }
 
   /* projects: a plain vertical list on phones (no pinning, no sideways track) */
   .projects { margin-top: 0; }
