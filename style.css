@@ -336,6 +336,7 @@ strong { color: var(--accent-2); font-weight: 600; }
 /* pulled up so the cards rise in while the about panel fades out (no blank scroll) */
 .projects { position: relative; margin-top: -60vh; }
 .projects-pin {
+  touch-action: pan-y pinch-zoom;   /* sideways drags are handled in script.js */
   position: sticky;
   top: 0;
   height: 100vh;
@@ -783,6 +784,7 @@ strong { color: var(--accent-2); font-weight: 600; }
   /* projects: a plain vertical list on phones (no pinning, no sideways track) */
   .projects { margin-top: 0; }
   .projects-pin {
+    touch-action: auto;
     position: static;
     height: auto;
     overflow: visible;

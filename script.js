@@ -263,6 +263,68 @@ document.querySelectorAll(".topbar nav a").forEach((a) =>
   })
 );
 
+// Sideways input while the projects track is pinned: trackpad side-swipes, Shift+wheel
+// and horizontal finger drags are turned into the vertical scroll that drives the track,
+// so the cards (and the contact card at the end) follow whichever way you scroll.
+// Outside the pinned stretch, and on phones (plain vertical list), nothing changes.
+const trackPinned = () => {
+  if (vertical) return false;
+  const r = projects.getBoundingClientRect();
+  return r.top <= 1 && r.bottom >= window.innerHeight - 1;
+};
+const scrollPageBy = (dy) => window.scrollBy({ top: dy, behavior: "instant" });
+
+window.addEventListener("wheel", (e) => {
+  if (e.ctrlKey) return;                                  // pinch-zoom on trackpads
+  let dx = e.deltaX, dy = e.deltaY;
+  if (e.shiftKey && !dx) { dx = dy; dy = 0; }             // Shift+wheel scrolls sideways
+  if (Math.abs(dx) <= Math.abs(dy) || !trackPinned()) return;
+  const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1;
+  e.preventDefault();                                     // also stops swipe-to-go-back here
+  scrollPageBy(dx * unit);
+}, { passive: false });
+
+// Touch: the pin only lets the browser pan vertically (CSS touch-action: pan-y), so a
+// sideways drag lands here; it scrolls the page by the drag and coasts a little on release.
+let drag = null;
+let coast = 0;
+pin.addEventListener("touchstart", (e) => {
+  cancelAnimationFrame(coast);
+  const t = e.touches[0];
+  drag = !vertical && e.touches.length === 1
+    ? { x0: t.clientX, y0: t.clientY, x: t.clientX, time: performance.now(), v: 0, axis: null }
+    : null;
+}, { passive: true });
+pin.addEventListener("touchmove", (e) => {
+  if (!drag) return;
+  const t = e.touches[0];
+  if (!drag.axis) {
+    const dx = t.clientX - drag.x0, dy = t.clientY - drag.y0;
+    if (Math.hypot(dx, dy) < 8) return;                   // wait to see which way it's going
+    drag.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+  }
+  if (drag.axis !== "x" || !trackPinned()) return;
+  e.preventDefault();
+  const now = performance.now(), step = t.clientX - drag.x;
+  scrollPageBy(-step);                                    // drag left → move on through the cards
+  drag.v = -step / Math.max(1, now - drag.time);          // px per ms, for the coast
+  drag.x = t.clientX;
+  drag.time = now;
+}, { passive: false });
+pin.addEventListener("touchend", () => {
+  if (drag && drag.axis === "x" && !reduceMotion.matches) {
+    let v = drag.v, last = performance.now();
+    const step = (now) => {
+      const dt = now - last; last = now;
+      scrollPageBy(v * dt);
+      v *= Math.pow(0.95, dt / 16);                        // ease to a stop
+      if (Math.abs(v) > 0.02 && trackPinned()) coast = requestAnimationFrame(step);
+    };
+    coast = requestAnimationFrame(step);
+  }
+  drag = null;
+});
+
 window.addEventListener("scroll", onScroll, { passive: true });
 window.addEventListener("resize", () => { layout(); onScroll(); });
 layout();
